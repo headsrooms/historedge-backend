@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "historedge-backend"
+version = "0.1.0"
+description = "Historedge backend"
+authors = ["Pablo Cabezas <pabcabsal@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+starlette = "^0.13"
+uvicorn = "^0.11"
+jinja2 = "^2.11"
+pyyaml = "^5.3"
+ujson = "^3.2.0"
+itsdangerous = "^1.1"
+python-dotenv = "^0.14"
+pydantic = "^1.6.1"
+uvloop = "^0.14.0"
+asyncpg = "^0.21.0"
+aredis = "^1.1.8"
+tortoise-orm = "^0.16.14"
+orjson = "^3.3.1"
+more_itertools = "^8.4.0"
+pyppeteer = { git = "https://github.com/pyppeteer/pyppeteer", rev = "dev" }
+parsel = "^1.6.0"
+selectolax = "^0.2.7"
+pyppeteer_stealth = "^1.0.2"
+
+[tool.poetry.dev-dependencies]
+pytest = { version = "^6.0.0-rc", allow-prereleases = true }
+pytest-asyncio = "^0.14.0"
+Faker = "^4.1.1"
+asynctest = "^0.13.0"
+pytest-cov = "^2.10.0"
+safety = "^1.9.0"
+httpx = "^0.14.3"
+asgi-lifespan = "^1.0.1"
+pylint = "^2.6.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+

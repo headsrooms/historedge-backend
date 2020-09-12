@@ -1,0 +1,83 @@
+version: "3.3"
+services:
+  api:
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    build: .
+    image: historedge
+    ports:
+      - 80:80
+    command: /usr/local/poetry/bin/poetry run uvicorn historedge_backend.api.app:app --reload --workers $API_WORKERS --port 80 --host 0.0.0.0
+  realtime_logger:
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - api
+      - db
+    env_file:
+      - .env
+    image: historedge
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.realtime_logger.service --workers $REALTIME_LOGGER_WORKERS
+  history_distributor:
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - api
+      - db
+    env_file:
+      - .env
+    image: historedge
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.history_distributor.service --workers $HISTORY_DISTRIBUTOR_WORKERS
+  history_logger:
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - api
+      - db
+    env_file:
+      - .env
+    image: historedge
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.history_logger.service --workers $HISTORY_LOGGER_WORKERS
+#  scraper_distributor:
+#    volumes:
+#      - ./:/code
+#    depends_on:
+#      - redis
+#      - api
+#      - db
+#    env_file:
+#      - .env
+#    image: historedge
+#    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.scraper_distributor.service --workers 1
+#  scraper:
+#    volumes:
+#      - ./:/code
+#    depends_on:
+#      - redis
+#      - api
+#      - db
+#      - scraper_distributor
+#    env_file:
+#      - .env
+#    image: historedge
+#    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.scraper.service --workers $SCRAPER_WORKERS
+  redis:
+    image: redis:latest
+  db:
+    image: postgres:latest
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+volumes:
+  pgdata:
