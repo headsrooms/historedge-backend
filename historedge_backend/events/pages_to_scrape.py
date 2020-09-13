@@ -34,7 +34,6 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
                 await asyncio.create_task(self.get_page_content(browser, page))
             except (TimeoutError, PageError, NetworkError) as e:
                 logging.error(str(e))
-        await browser.close()
 
     @staticmethod
     async def get_page_content(browser: Browser, page: PageToScrape):
