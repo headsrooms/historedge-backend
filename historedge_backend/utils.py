@@ -1,22 +1,11 @@
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
-from more_itertools import grouper
 from selectolax.parser import HTMLParser
 from starlette.responses import Response
 
 
 class PlainJSONResponse(Response):
     media_type = "application/json"
-
-
-def serialize(
-    iterable: Iterable, root_name: str = "data", page: int = 0, page_size: int = 100
-):
-    return {root_name: get_page(iterable, page, page_size)}
-
-
-def get_page(iterable: Iterable, page: int, page_size: int):
-    return list(grouper(iterable, page_size))[page]
 
 
 def get_links(html: str) -> Optional[List[str]]:

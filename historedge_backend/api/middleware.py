@@ -3,7 +3,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
-from historedge_backend.api import settings
+from historedge_backend import settings
 
 middleware = []
 

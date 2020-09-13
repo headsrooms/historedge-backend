@@ -5,12 +5,7 @@ from typing import Tuple, Dict, List, AsyncIterable
 
 from aredis import StrictRedis
 
-
-@dataclass(frozen=True)
-class RedisChannel:
-    stream: str
-    group: str
-    consumer: str
+from historedge_backend.channel import RedisChannel
 
 
 @dataclass(frozen=True)

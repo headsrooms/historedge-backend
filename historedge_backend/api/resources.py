@@ -1,5 +1,5 @@
 from aredis import StrictRedis
 
-from historedge_backend.api import settings
+from historedge_backend import settings
 
 redis = StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)

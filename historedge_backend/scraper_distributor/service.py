@@ -1,24 +1,23 @@
 import logging
-import sys
 
 import orjson
 import uvloop
 from tortoise import Tortoise, run_async
 
-from historedge_backend.api.settings import (
+from historedge_backend.settings import (
     DB_USER,
     DB_PASSWORD,
     DB_HOST,
     DB_PORT,
     DB_NAME,
+    SCRAPER_DISTRIBUTOR_CHUNK_LENGTH,
+    REDIS_HOST,
+    REDIS_PORT,
 )
 from historedge_backend.models import PageVisit
 from historedge_backend.producer import PeriodicProducer
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-REDIS_HOST = "redis"
-REDIS_PORT = 6379
-CHUNK_LENGTH = 1_000
 
 
 class ScraperDistributor(PeriodicProducer):
@@ -47,6 +46,7 @@ class ScraperDistributor(PeriodicProducer):
             pages = [
                 {"id": str(page["id"]), "url": page["url"]} for page in page_visits
             ]
+
             await self.redis.xadd(
                 self.publish_stream, {"data": orjson.dumps({"pages": pages})}
             )

@@ -9,12 +9,15 @@ from pydantic import ValidationError
 from tortoise import Tortoise, run_async
 from tortoise.exceptions import DoesNotExist
 
-from historedge_backend.api.settings import (
+from historedge_backend.settings import (
     DB_USER,
     DB_PASSWORD,
     DB_HOST,
     DB_PORT,
     DB_NAME,
+    HISTORY_DISTRIBUTOR_CHUNK_LENGTH,
+    REDIS_HOST,
+    REDIS_PORT,
 )
 from historedge_backend.events.history import HistoryDumpReceived
 from historedge_backend.intercom import Intercom

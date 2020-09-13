@@ -1,24 +1,23 @@
 import logging
-import sys
 from dataclasses import dataclass, asdict
 
 import uvloop
 from pyppeteer import launch
 from tortoise import run_async
 
-from historedge_backend.api.settings import (
+from historedge_backend.settings import (
     DB_USER,
     DB_PASSWORD,
     DB_HOST,
     DB_PORT,
     DB_NAME,
+    REDIS_HOST,
+    REDIS_PORT,
 )
 from historedge_backend.consumer import RedisChannel
 from historedge_backend.scraper.consumer import ScraperConsumer
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-REDIS_HOST = "redis"
-REDIS_PORT = 6379
 
 
 @dataclass
@@ -46,6 +45,7 @@ class Scraper:
                 '--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36',
             ],
         )
+
         self.consumer = ScraperConsumer(
             **asdict(self.subscribe_channel), browser=browser
         )

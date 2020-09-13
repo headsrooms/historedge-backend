@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 from aredis import StrictRedis
 
-from historedge_backend.api.settings import REDIS_HOST, REDIS_PORT
+from historedge_backend.settings import REDIS_HOST, REDIS_PORT
 
 
 @dataclass(frozen=True)

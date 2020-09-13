@@ -5,8 +5,8 @@ from typing import Tuple, Dict, List, Any, AsyncIterable
 
 from aredis import StrictRedis
 
-from historedge_backend.api.settings import REDIS_HOST, REDIS_PORT
-from historedge_backend.consumer import RedisChannel
+from historedge_backend.settings import REDIS_HOST, REDIS_PORT
+from historedge_backend.channel import RedisChannel
 
 
 @dataclass(frozen=True)

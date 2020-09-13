@@ -8,7 +8,7 @@ from faker import Faker
 from starlette.applications import Starlette
 from tortoise.contrib.starlette import register_tortoise
 
-from historedge_backend.api import settings
+from historedge_backend import settings
 from historedge_backend.api.exception_handlers import exception_handlers
 from historedge_backend.api.middleware import middleware
 from historedge_backend.api.routes import routes

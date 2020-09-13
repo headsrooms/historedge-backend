@@ -1,11 +1,11 @@
 from json import JSONDecodeError
 
+import orjson
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import UJSONResponse
 from starlette.status import HTTP_201_CREATED
-import orjson
 
 from historedge_backend.api.constants import MALFORMED_JSON_MESSAGE
 from historedge_backend.api.resources import redis

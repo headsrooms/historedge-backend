@@ -3,13 +3,13 @@ import logging
 from dataclasses import dataclass
 from typing import Dict
 
-import Tortoise
 from pydantic import ValidationError
 from pyppeteer.browser import Browser
+from tortoise import Tortoise
 
+from historedge_backend.settings import DB_URL
 from historedge_backend.consumer import Consumer
 from historedge_backend.events.pages_to_scrape import BatchOfPagesToScrapeReceived
-from historedge_backend.scraper.service import DB_URL
 
 
 @dataclass(frozen=True)

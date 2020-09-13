@@ -1,25 +1,24 @@
 import asyncio
 import logging
-import sys
 from typing import Dict
 
 import uvloop
 from pydantic import ValidationError
 from tortoise import Tortoise, run_async
 
-from historedge_backend.api.settings import (
+from historedge_backend.settings import (
     DB_USER,
     DB_PASSWORD,
     DB_HOST,
     DB_PORT,
     DB_NAME,
+    REDIS_HOST,
+    REDIS_PORT,
 )
 from historedge_backend.consumer import Consumer
 from historedge_backend.events.history import HistoryDumpReceived
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-REDIS_HOST = "redis"
-REDIS_PORT = 6379
 
 
 class HistoryLogger(Consumer):
