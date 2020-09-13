@@ -17,7 +17,7 @@ class PageVisited(RedisEvent):
     content: str
     visited_at: datetime
 
-    async def create(self):
+    async def save(self):
         page, _ = await Page.get_or_create(url=self.url)
         try:
             await User.get(id=self.user_id)
