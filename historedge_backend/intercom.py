@@ -2,6 +2,7 @@ import asyncio
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import Tuple, Dict, List, Any, AsyncIterable
+from uuid import uuid4
 
 from aredis import StrictRedis
 
@@ -25,6 +26,7 @@ class Intercom(ABC):
         redis_host: str,
         redis_port: int,
     ):
+        consumer = f"{str(cls.__name__)}-{str(uuid4())}"
         redis = StrictRedis(host=redis_host, port=redis_port)
         subscribe_channel = RedisChannel(subscribe_stream, group, consumer)
         return cls(subscribe_channel, publish_stream, redis)

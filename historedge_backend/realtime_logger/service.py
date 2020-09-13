@@ -1,6 +1,6 @@
 import asyncio
 import logging
-import sys
+
 from typing import Dict
 
 import uvloop
@@ -43,10 +43,7 @@ class RealtimeLogger(Consumer):
 
 
 if __name__ == "__main__":
-    worker_id = sys.argv[1]
     uvloop.install()
 
-    logger = RealtimeLogger.create(
-        "realtime_pages", "group", f"consumer_{worker_id}", REDIS_HOST, REDIS_PORT
-    )
+    logger = RealtimeLogger.create("realtime_pages", "group", REDIS_HOST, REDIS_PORT)
     run_async(logger.run())

@@ -24,9 +24,6 @@ from historedge_backend.intercom import Intercom
 from historedge_backend.models import User
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-REDIS_HOST = "redis"
-REDIS_PORT = 6379
-CHUNK_LENGTH = 1_000
 
 
 class HistoryDistributor(Intercom):
@@ -65,13 +62,11 @@ class HistoryDistributor(Intercom):
 
 
 if __name__ == "__main__":
-    worker_id = sys.argv[1]
     uvloop.install()
 
     distributor = HistoryDistributor.create(
         "history_dumps",
         "group",
-        f"consumer_{worker_id}",
         "history_chunks",
         REDIS_HOST,
         REDIS_PORT,

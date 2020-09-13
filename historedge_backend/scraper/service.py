@@ -1,7 +1,9 @@
 import logging
 from dataclasses import dataclass, asdict
+from uuid import uuid4
 
 import uvloop
+from aredis import StrictRedis
 from pyppeteer import launch
 from tortoise import run_async
 
@@ -14,7 +16,7 @@ from historedge_backend.settings import (
     REDIS_HOST,
     REDIS_PORT,
 )
-from historedge_backend.consumer import RedisChannel
+from historedge_backend.channel import RedisChannel
 from historedge_backend.scraper.consumer import ScraperConsumer
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -23,11 +25,14 @@ DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 @dataclass
 class Scraper:
     subscribe_channel: RedisChannel
+    redis: StrictRedis
     consumer: ScraperConsumer = None
 
     @classmethod
-    def create(cls, stream: str, group: str, consumer: str):
-        return cls(RedisChannel(stream, group, consumer))
+    def create(cls, stream: str, group: str, redis_host: str, redis_port: int):
+        consumer = f"{str(cls.__name__)}-{str(uuid4())}"
+        redis = StrictRedis(host=redis_host, port=redis_port)
+        return cls(RedisChannel(stream, group, consumer), redis)
 
     async def initialize(self):
         browser = await launch(
@@ -47,7 +52,7 @@ class Scraper:
         )
 
         self.consumer = ScraperConsumer(
-            **asdict(self.subscribe_channel), browser=browser
+            RedisChannel(**asdict(self.subscribe_channel)), self.redis, browser=browser
         )
 
     async def finalize(self):
@@ -60,8 +65,7 @@ class Scraper:
 
 
 if __name__ == "__main__":
-    worker_id = sys.argv[1]
     uvloop.install()
 
-    scraper = Scraper.create("pages_to_scrape", "group", f"consumer_{worker_id}")
+    scraper = Scraper.create("pages_to_scrape", "group", REDIS_HOST, REDIS_PORT)
     run_async(scraper.run())

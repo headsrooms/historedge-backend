@@ -42,10 +42,7 @@ class HistoryLogger(Consumer):
 
 
 if __name__ == "__main__":
-    worker_id = sys.argv[1]
     uvloop.install()
 
-    logger = HistoryLogger.create(
-        "history_chunks", "group", f"consumer_{worker_id}", REDIS_HOST, REDIS_PORT
-    )
+    logger = HistoryLogger.create("history_chunks", "group", REDIS_HOST, REDIS_PORT)
     run_async(logger.run())

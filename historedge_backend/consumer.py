@@ -2,6 +2,7 @@ import asyncio
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import Tuple, Dict, List, AsyncIterable
+from uuid import uuid4
 
 from aredis import StrictRedis
 
@@ -14,9 +15,8 @@ class Consumer(ABC):
     redis: StrictRedis
 
     @classmethod
-    def create(
-        cls, stream: str, group: str, consumer: str, redis_host: str, redis_port: int
-    ):
+    def create(cls, stream: str, group: str, redis_host: str, redis_port: int):
+        consumer = f"{str(cls.__name__)}-{str(uuid4())}"
         redis = StrictRedis(host=redis_host, port=redis_port)
         return cls(RedisChannel(stream, group, consumer), redis)
 

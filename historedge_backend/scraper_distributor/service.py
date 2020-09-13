@@ -53,7 +53,6 @@ class ScraperDistributor(PeriodicProducer):
 
 
 if __name__ == "__main__":
-    worker_id = sys.argv[1]
     uvloop.install()
 
     distributor = ScraperDistributor.create("pages_to_scrape", REDIS_HOST, REDIS_PORT)
