@@ -1,10 +1,9 @@
 import logging
-import sys
 from typing import Dict, Any, AsyncIterable
 
 import orjson
 import uvloop
-from more_itertools import chunked
+from aioitertools.more_itertools import chunked
 from pydantic import ValidationError
 from tortoise import Tortoise, run_async
 from tortoise.exceptions import DoesNotExist

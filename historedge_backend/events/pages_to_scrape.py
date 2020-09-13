@@ -2,6 +2,7 @@ import asyncio
 import logging
 from typing import List, Dict
 
+import orjson
 from pydantic import BaseModel
 from pyppeteer.browser import Browser
 from pyppeteer.errors import TimeoutError, PageError, NetworkError
