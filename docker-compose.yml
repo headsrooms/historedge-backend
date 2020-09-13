@@ -23,7 +23,7 @@ services:
     env_file:
       - .env
     image: historedge
-    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.realtime_logger.service --workers $REALTIME_LOGGER_WORKERS
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.realtime_logger.service
   history_distributor:
     volumes:
       - ./:/app
@@ -34,7 +34,7 @@ services:
     env_file:
       - .env
     image: historedge
-    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.history_distributor.service --workers $HISTORY_DISTRIBUTOR_WORKERS
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.history_distributor.service
   history_logger:
     volumes:
       - ./:/app
@@ -45,30 +45,28 @@ services:
     env_file:
       - .env
     image: historedge
-    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.history_logger.service --workers $HISTORY_LOGGER_WORKERS
-#  scraper_distributor:
-#    volumes:
-#      - ./:/code
-#    depends_on:
-#      - redis
-#      - api
-#      - db
-#    env_file:
-#      - .env
-#    image: historedge
-#    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.scraper_distributor.service --workers 1
-#  scraper:
-#    volumes:
-#      - ./:/code
-#    depends_on:
-#      - redis
-#      - api
-#      - db
-#      - scraper_distributor
-#    env_file:
-#      - .env
-#    image: historedge
-#    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.worker historedge_backend.scraper.service --workers $SCRAPER_WORKERS
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.history_logger.service
+  scraper_distributor:
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    image: historedge
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.scraper_distributor.service
+  scraper:
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - db
+      - scraper_distributor
+    env_file:
+      - .env
+    image: historedge
+    command: /usr/local/poetry/bin/poetry run python -m historedge_backend.scraper.service
   redis:
     image: redis:latest
   db:
