@@ -18,12 +18,11 @@ class PageToScrape(BaseModel):
     url: str
 
     async def save_as_page_visit(self, content: str, links: List[str]):
-        links = [await Page.get_or_create(url=link) for link in links]
-        pages = PageVisit.filter(page__id=self.id, is_processed=False)
+        links = [(await Page.get_or_create(url=link))[0] for link in links]
+        pages = PageVisit.filter(page=self.id, is_processed=False)
         for page in await pages:
             await page.links.add(*links)
         await pages.update(content=content, is_processed=True)
-        print(self.url, len(content), links)
 
 
 class BatchOfPagesToScrapeReceived(RedisEvent):
