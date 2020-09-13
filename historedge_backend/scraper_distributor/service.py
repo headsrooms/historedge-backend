@@ -32,13 +32,13 @@ class ScraperDistributor(PeriodicProducer):
 
     async def create_periodic_event(self):
         page_visits_count = await PageVisit.all().count()
-        offsets = range(0, page_visits_count, CHUNK_LENGTH)
+        offsets = range(0, page_visits_count, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
         for offset in offsets:
             page_visits = await (
                 PageVisit.filter(is_processed=False)
                 .prefetch_related("page")
                 .order_by("visited_at")
-                .limit(CHUNK_LENGTH)
+                .limit(SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
                 .offset(offset)
                 .values(id="page__id", url="page__url")
             )
