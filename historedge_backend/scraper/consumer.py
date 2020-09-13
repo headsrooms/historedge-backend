@@ -24,6 +24,7 @@ class ScraperConsumer(Consumer):
 
     async def finalize(self):
         logging.info(f"Finalizing {str(self)}")
+        await self.browser.close()
 
     async def handle_event(self, event: Dict[bytes, bytes]):
         try:
