@@ -2,7 +2,7 @@
 name = "historedge-backend"
 version = "0.1.0"
 description = "Historedge backend"
-authors = ["Pablo Cabezas <pabcabsal@gmail.com>"]
+authors = ["Pablo Cabezas <headsrooms@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
