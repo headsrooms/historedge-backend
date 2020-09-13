@@ -38,7 +38,9 @@ class Intercom(ABC):
         pass
 
     @abstractmethod
-    async def handle_event(self, event: Dict[bytes, bytes]) -> AsyncIterable[Dict[str, Any]]:
+    async def handle_event(
+        self, event: Dict[bytes, bytes]
+    ) -> AsyncIterable[Dict[str, Any]]:
         pass
 
     async def publish(self, event: Dict[str, Any]):
