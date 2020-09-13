@@ -49,11 +49,11 @@ class HistoryDistributor(Intercom):
         else:
             logging.info(f"Registering history of user {history_dump.user_id}")
             history_dump = history_dump.dict()
-            history_chunks = (
-                {"user_id": history_dump["user_id"], "items": list(chunk)}
-                for chunk in chunked(history_dump["items"], CHUNK_LENGTH)
-            )
-            for i, chunk in enumerate(history_chunks):
+
+            async for chunk in chunked(
+                history_dump["items"], HISTORY_DISTRIBUTOR_CHUNK_LENGTH
+            ):
+                chunk = {"user_id": history_dump["user_id"], "items": list(chunk)}
                 data = {"data": orjson.dumps(chunk)}
                 yield data
 
