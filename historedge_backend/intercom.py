@@ -20,7 +20,6 @@ class Intercom(ABC):
         cls,
         subscribe_stream: str,
         group: str,
-        consumer: str,
         publish_stream: str,
         redis_host: str,
         redis_port: int,
