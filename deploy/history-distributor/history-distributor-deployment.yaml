@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: history-distributor
+  name: history-distributor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: history-distributor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: history-distributor
+    spec:
+      containers:
+      - args:
+        - /usr/local/poetry/bin/poetry
+        - run
+        - python
+        - -m
+        - historedge_backend.history_distributor.service
+        env:
+          - name: API_WORKERS
+            valueFrom:
+              configMapKeyRef:
+                key: API_WORKERS
+                name: env
+          - name: API_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: API_PORT
+                name: env
+          - name: API_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: API_HOST
+                name: env
+          - name: DEBUG
+            valueFrom:
+              configMapKeyRef:
+                key: DEBUG
+                name: env
+          - name: GENERATE_SCHEMAS
+            valueFrom:
+              configMapKeyRef:
+                key: GENERATE_SCHEMAS
+                name: env
+          - name: GZIP
+            valueFrom:
+              configMapKeyRef:
+                key: GZIP
+                name: env
+          - name: HISTORY_DISTRIBUTOR_CHUNK_LENGTH
+            valueFrom:
+              configMapKeyRef:
+                key: HISTORY_DISTRIBUTOR_CHUNK_LENGTH
+                name: env
+          - name: HTTPS_ONLY
+            valueFrom:
+              configMapKeyRef:
+                key: HTTPS_ONLY
+                name: env
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRES_DB
+                name: env
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRES_PASSWORD
+                name: env
+          - name: POSTGRES_PORT
+            value: $(DB_SERVICE_PORT)
+          - name: POSTGRES_SERVER
+            value: $(DB_SERVICE_HOST)
+          - name: POSTGRES_USER
+            valueFrom:
+              configMapKeyRef:
+                key: POSTGRES_USER
+                name: env
+          - name: REDIS_HOST
+            value: $(REDIS_SERVICE_HOST)
+          - name: REDIS_PORT
+            value: $(REDIS_SERVICE_PORT)
+          - name: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
+            valueFrom:
+              configMapKeyRef:
+                key: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
+                name: env
+          - name: SENTRY
+            valueFrom:
+              configMapKeyRef:
+                key: SENTRY
+                name: env
+        image: headsrooms/historedge
+        imagePullPolicy: ""
+        name: history-distributor
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+status: {}

@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.7"
 services:
   api:
     volumes:
@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     build: .
-    image: historedge
+    image: headsrooms/historedge
     ports:
       - 80:80
     command: /usr/local/poetry/bin/poetry run uvicorn historedge_backend.api.app:app --reload --workers $API_WORKERS --port 80 --host 0.0.0.0
@@ -22,7 +22,7 @@ services:
       - db
     env_file:
       - .env
-    image: historedge
+    image: headsrooms/historedge
     command: /usr/local/poetry/bin/poetry run python -m historedge_backend.realtime_logger.service
   history_distributor:
     volumes:
@@ -33,7 +33,7 @@ services:
       - db
     env_file:
       - .env
-    image: historedge
+    image: headsrooms/historedge
     command: /usr/local/poetry/bin/poetry run python -m historedge_backend.history_distributor.service
   history_logger:
     volumes:
@@ -44,7 +44,7 @@ services:
       - db
     env_file:
       - .env
-    image: historedge
+    image: headsrooms/historedge
     command: /usr/local/poetry/bin/poetry run python -m historedge_backend.history_logger.service
   scraper_distributor:
     volumes:
@@ -54,7 +54,7 @@ services:
       - db
     env_file:
       - .env
-    image: historedge
+    image: headsrooms/historedge
     command: /usr/local/poetry/bin/poetry run python -m historedge_backend.scraper_distributor.service
   scraper:
     volumes:
@@ -65,7 +65,7 @@ services:
       - scraper_distributor
     env_file:
       - .env
-    image: historedge
+    image: headsrooms/historedge
     command: /usr/local/poetry/bin/poetry run python -m historedge_backend.scraper.service
   redis:
     image: redis:latest

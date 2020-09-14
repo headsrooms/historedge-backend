@@ -1,0 +1,25 @@
+apiVersion: v1
+data:
+  API_WORKERS: "15"
+  API_PORT: "80"
+  API_HOST: "0.0.0.0"
+  DEBUG: "False"
+  GENERATE_SCHEMAS: "True"
+  GZIP: "True"
+  HISTORY_DISTRIBUTOR_CHUNK_LENGTH: "10000"
+  HTTPS_ONLY: "False"
+  POSTGRES_DB: app
+  POSTGRES_PASSWORD: "123456"
+  POSTGRES_PORT: "5432"
+  POSTGRES_SERVER: db
+  POSTGRES_USER: postgres
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  SCRAPER_DISTRIBUTOR_CHUNK_LENGTH: "1000"
+  SENTRY: "False"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api-env
+  name: env
