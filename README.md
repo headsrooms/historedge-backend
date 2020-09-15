@@ -1,5 +1,7 @@
 # Historedge
 
+WIP.
+
 Historedge is a personal Google or a [Memex](https://es.wikipedia.org/wiki/Memex) of your browser history.
 
 
