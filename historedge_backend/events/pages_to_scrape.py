@@ -1,7 +1,7 @@
 import asyncio
-import logging
 from typing import List, Dict
 
+from loguru import logger
 import orjson
 from pydantic import BaseModel
 from pyppeteer.browser import Browser
@@ -33,7 +33,7 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
             try:
                 await asyncio.create_task(self.get_page_content(browser, page))
             except (TimeoutError, PageError, NetworkError) as e:
-                logging.error(str(e))
+                logger.exception(str(e))
 
     @staticmethod
     async def get_page_content(browser: Browser, page: PageToScrape):

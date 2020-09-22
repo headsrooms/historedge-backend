@@ -1,8 +1,8 @@
-import logging
-
 import orjson
 import uvloop
 from tortoise import Tortoise, run_async
+
+from loguru import logger
 
 from historedge_backend.settings import (
     DB_USER,
@@ -22,13 +22,13 @@ DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 class ScraperDistributor(PeriodicProducer):
     async def initialize(self):
-        logging.info(f"Initializing {str(self)}")
+        logger.info(f"Initializing {str(self)}")
         await Tortoise.init(
             db_url=DB_URL, modules={"models": ["historedge_backend.models"]}
         )
 
     async def finalize(self):
-        logging.info(f"Finalizing {str(self)}")
+        logger.info(f"Finalizing {str(self)}")
 
     async def create_periodic_event(self):
         page_visits_count = await PageVisit.all().count()

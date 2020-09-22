@@ -1,8 +1,7 @@
 import asyncio
-import logging
-
 from typing import Dict
 
+from loguru import logger
 import uvloop
 from pydantic import ValidationError
 from tortoise import Tortoise, run_async
@@ -24,20 +23,20 @@ DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 class RealtimeLogger(Consumer):
     async def initialize(self):
-        logging.info(f"Initializing {str(self)}")
+        logger.info(f"Initializing {str(self)}")
         await Tortoise.init(
             db_url=DB_URL, modules={"models": ["historedge_backend.models"]}
         )
 
     async def finalize(self):
-        logging.info(f"Finalizing {str(self)}")
+        logger.info(f"Finalizing {str(self)}")
 
     async def handle_event(self, event: Dict[bytes, bytes]):
         try:
             page_visited = PageVisited.deserialize(event)
         except ValidationError as e:
             if event and "opening" not in event:
-                logging.error(e)
+                logger.exception(str(e))
         else:
             asyncio.create_task(page_visited.save())
 

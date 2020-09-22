@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from aredis import ResponseError
 
@@ -27,7 +27,7 @@ async def create_group():
             await redis.xgroup_create(stream, group, "$")
         except ResponseError as e:
             if "already exists" not in str(e):
-                logging.error(e)
+                logger.exception(e)
 
 
 on_startup = [create_stream, create_group]

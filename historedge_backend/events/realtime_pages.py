@@ -1,8 +1,8 @@
-import logging
 from datetime import datetime
 from json.decoder import JSONDecodeError
 from uuid import UUID
 
+from loguru import logger
 from tortoise.exceptions import DoesNotExist
 
 from historedge_backend.api.constants import MALFORMED_JSON_MESSAGE
@@ -22,9 +22,9 @@ class PageVisited(RedisEvent):
         try:
             await User.get(id=self.user_id)
         except DoesNotExist:
-            logging.error(f"There is no user with id {self.user_id}")
+            logger.exception(f"There is no user with id {self.user_id}")
         except JSONDecodeError:
-            logging.error(MALFORMED_JSON_MESSAGE)
+            logger.exception(MALFORMED_JSON_MESSAGE)
         else:
             await PageVisit.get_or_create(
                 page_id=page.id,

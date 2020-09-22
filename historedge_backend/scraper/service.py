@@ -1,7 +1,7 @@
-import logging
 from dataclasses import dataclass, asdict
 from uuid import uuid4
 
+from loguru import logger
 import uvloop
 from aredis import StrictRedis
 from pyppeteer import launch
@@ -56,7 +56,7 @@ class Scraper:
         )
 
     async def finalize(self):
-        logging.info(f"Finalizing {str(self)}")
+        logger.info(f"Finalizing {str(self)}")
 
     async def run(self):
         await self.initialize()

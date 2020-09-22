@@ -1,7 +1,7 @@
 import asyncio
-import logging
 from json import JSONDecodeError
 
+from loguru import logger
 import orjson
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
@@ -23,8 +23,8 @@ async def visit_page(request: Request) -> UJSONResponse:
     except JSONDecodeError:
         raise HTTPException(status_code=400, detail=MALFORMED_JSON_MESSAGE)
     except ValidationError as e:
-        logging.error(f"Ignoring request. Cannot serialize {page}")
-        logging.error(str(e))
+        logger.error(f"Ignoring request. Cannot serialize {page}")
+        logger.exception(str(e))
         raise HTTPException(
             status_code=400,
             detail="Cannot serialize request",

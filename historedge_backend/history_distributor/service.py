@@ -1,6 +1,6 @@
-import logging
 from typing import Dict, Any, AsyncIterable
 
+from loguru import logger
 import orjson
 import uvloop
 from aioitertools.more_itertools import chunked
@@ -27,13 +27,13 @@ DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 class HistoryDistributor(Intercom):
     async def initialize(self):
-        logging.info(f"Initializing {str(self)}")
+        logger.info(f"Initializing {str(self)}")
         await Tortoise.init(
             db_url=DB_URL, modules={"models": ["historedge_backend.models"]}
         )
 
     async def finalize(self):
-        logging.info(f"Finalizing {str(self)}")
+        logger.info(f"Finalizing {str(self)}")
 
     async def handle_event(
         self, event: Dict[bytes, bytes]
@@ -43,11 +43,11 @@ class HistoryDistributor(Intercom):
             await User.get(id=history_dump.user_id)
         except (ValidationError, AttributeError) as e:
             if event and "opening" not in event:
-                logging.error(e)
+                logger.exception(str(e))
         except DoesNotExist:
-            logging.error(f"There is no user with id {history_dump.user_id}")
+            logger.exception(f"There is no user with id {history_dump.user_id}")
         else:
-            logging.info(f"Registering history of user {history_dump.user_id}")
+            logger.info(f"Registering history of user {history_dump.user_id}")
             history_dump = history_dump.dict()
 
             async for chunk in chunked(
@@ -57,7 +57,7 @@ class HistoryDistributor(Intercom):
                 data = {"data": orjson.dumps(chunk)}
                 yield data
 
-            logging.info(f"Finished history registry of user {history_dump['user_id']}")
+            logger.info(f"Finished history registry of user {history_dump['user_id']}")
 
 
 if __name__ == "__main__":

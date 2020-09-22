@@ -1,7 +1,8 @@
 import argparse
-import logging
 import subprocess
 import uuid
+
+from loguru import logger
 
 
 def create_process(executable, consumer):
@@ -40,7 +41,7 @@ def main() -> None:
 
     for consumer, p in processes:
         if p.wait() != 0:
-            logging.error(f"There was an error in {consumer}")
+            logger.error(f"There was an error in {consumer}")
 
 
 if __name__ == "__main__":
