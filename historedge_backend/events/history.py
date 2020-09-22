@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timezone
 from typing import List, Dict
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import orjson
 from pydantic import BaseModel
@@ -30,6 +30,7 @@ class HistoryItem(BaseModel):
 class HistoryDumpReceived(RedisEvent):
     user_id: UUID
     items: List[HistoryItem]
+    id: UUID = uuid4()
 
     async def save(self):
         aws = []
