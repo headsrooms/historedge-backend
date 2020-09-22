@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import orjson
 import uvloop
 from tortoise import Tortoise, run_async
@@ -43,12 +45,12 @@ class ScraperDistributor(PeriodicProducer):
                 .values(id="page__id", url="page__url")
             )
 
-            pages = [
+            pages = {"id": uuid4(), "items": [
                 {"id": str(page["id"]), "url": page["url"]} for page in page_visits
-            ]
+            ]}
 
             await self.redis.xadd(
-                self.publish_stream, {"data": orjson.dumps({"pages": pages})}
+                self.publish_stream, {"data": orjson.dumps(pages)}
             )
 
 

@@ -1,5 +1,6 @@
 import asyncio
 from typing import List, Dict
+from uuid import UUID
 
 from loguru import logger
 import orjson
@@ -26,10 +27,14 @@ class PageToScrape(BaseModel):
 
 
 class BatchOfPagesToScrapeReceived(RedisEvent):
-    pages: List[PageToScrape]
+    id: UUID
+    items: List[PageToScrape]
 
     async def scrape(self, browser: Browser):
-        for page in self.pages:
+        logger.info("Before scraping {batch} n_items:{n_items}",
+                    batch=self.id,
+                    n_items=len(self.items))
+        for page in self.items:
             try:
                 await asyncio.create_task(self.get_page_content(browser, page))
             except (TimeoutError, PageError, NetworkError) as e:
