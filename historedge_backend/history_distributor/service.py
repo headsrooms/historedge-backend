@@ -45,9 +45,11 @@ class HistoryDistributor(Intercom):
             if event and "opening" not in event:
                 logger.exception(str(e))
         except DoesNotExist:
-            logger.exception(f"There is no user with id {history_dump.user_id}")
+            logger.exception("There is no user with id {user_id}", user_id=history_dump.user_id)
         else:
-            logger.info(f"Registering history of user {history_dump.user_id}")
+            logger.info("Dump received {dump} n_items:{n_items}",
+                        dump=history_dump.id,
+                        n_items=len(history_dump.items))
             history_dump = history_dump.dict()
 
             async for chunk in chunked(
@@ -57,7 +59,9 @@ class HistoryDistributor(Intercom):
                 data = {"data": orjson.dumps(chunk)}
                 yield data
 
-            logger.info(f"Finished history registry of user {history_dump['user_id']}")
+            logger.info("Dump distributed {dump} n_items:{n_items}",
+                        dump=history_dump["id"],
+                        n_items=len(history_dump["items"]))
 
 
 if __name__ == "__main__":

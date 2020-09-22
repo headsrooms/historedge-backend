@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import List, Dict
 from uuid import UUID, uuid4
 
+from loguru import logger
 import orjson
 from pydantic import BaseModel
 
@@ -34,11 +35,10 @@ class HistoryDumpReceived(RedisEvent):
 
     async def save(self):
         aws = []
-        print(f"Registering a chunk of history of user {self.user_id}")
         for item in self.items:
             aws.append(item.save(self.user_id))
         await asyncio.gather(*aws)
-        print(f"Finished to process chunk of history of user {self.user_id}")
+        logger.info("Saved dump {dump}", dump=self.id)
 
     @staticmethod
     def convert(data) -> Dict[str, str]:
