@@ -23,6 +23,7 @@ pyppeteer = { git = "https://github.com/pyppeteer/pyppeteer", rev = "dev" }
 selectolax = "^0.2.7"
 pyppeteer_stealth = "^1.0.2"
 aioitertools = "^0.7.0"
+loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = { version = "^6.0.0-rc", allow-prereleases = true }
