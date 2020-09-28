@@ -2,7 +2,10 @@ from starlette.routing import Route
 
 from historedge_backend.api.endpoints.bookmarks import bookmark_page, get_bookmarks
 from historedge_backend.api.endpoints.history import register_history
-from historedge_backend.api.endpoints.page_visits import get_page_visits, distribute_page_visits_to_scraper
+from historedge_backend.api.endpoints.page_visits import (
+    get_page_visits,
+    distribute_page_visits_to_scraper,
+)
 from historedge_backend.api.endpoints.pages import visit_page, get_pages
 from historedge_backend.api.endpoints.users import create_user
 

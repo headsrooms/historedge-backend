@@ -26,8 +26,7 @@ async def visit_page(request: Request) -> UJSONResponse:
         logger.error(f"Ignoring request. Cannot serialize {page}")
         logger.exception(str(e))
         raise HTTPException(
-            status_code=400,
-            detail="Cannot serialize request",
+            status_code=400, detail="Cannot serialize request",
         )
     else:
         asyncio.create_task(redis.xadd("realtime_pages", response))

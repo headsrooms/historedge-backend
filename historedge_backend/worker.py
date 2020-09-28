@@ -9,8 +9,7 @@ def create_process(executable, consumer):
     return (
         consumer,
         subprocess.Popen(
-            ["nohup", "python", "-m", executable, consumer],
-            start_new_session=True,
+            ["nohup", "python", "-m", executable, consumer], start_new_session=True,
         ),
     )
 

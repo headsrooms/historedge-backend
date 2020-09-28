@@ -32,9 +32,11 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
     items: List[PageToScrape]
 
     async def scrape(self, browser: Browser):
-        logger.info("Before scraping {batch} n_items:{n_items}",
-                    batch=self.id,
-                    n_items=len(self.items))
+        logger.info(
+            "Before scraping {batch} n_items:{n_items}",
+            batch=self.id,
+            n_items=len(self.items),
+        )
         for page in self.items:
             try:
                 browser_page = await browser.newPage()
@@ -42,9 +44,11 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
                 await asyncio.create_task(self.get_page_content(browser_page, page))
             except (TimeoutError, PageError, NetworkError) as e:
                 logger.exception(str(e))
-        logger.info("Scrape finished {batch} n_items:{n_items}",
-                    batch=self.id,
-                    n_items=len(self.items))
+        logger.info(
+            "Scrape finished {batch} n_items:{n_items}",
+            batch=self.id,
+            n_items=len(self.items),
+        )
 
     @staticmethod
     async def get_page_content(browser: Page, page: PageToScrape):

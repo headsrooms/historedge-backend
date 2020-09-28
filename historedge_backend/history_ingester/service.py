@@ -37,8 +37,11 @@ class HistoryIngester(Consumer):
     async def handle_event(self, event: Dict[bytes, bytes]):
         try:
             history_dump = HistoryDumpReceived.deserialize(event)
-            logger.info("History dump received {dump} n_items:{n_items}",
-                        dump=history_dump.id, n_items=len(history_dump.items))
+            logger.info(
+                "History dump received {dump} n_items:{n_items}",
+                dump=history_dump.id,
+                n_items=len(history_dump.items),
+            )
         except ValidationError as e:
             if event and "opening" not in event:
                 logger.exception(str(e))

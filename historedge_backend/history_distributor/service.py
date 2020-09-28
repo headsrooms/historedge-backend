@@ -48,11 +48,15 @@ class HistoryDistributor(Intercom):
             if event and "opening" not in event:
                 logger.exception(str(e))
         except DoesNotExist:
-            logger.exception("There is no user with id {user_id}", user_id=history_dump.user_id)
+            logger.exception(
+                "There is no user with id {user_id}", user_id=history_dump.user_id
+            )
         else:
-            logger.info("Dump received {dump} n_items:{n_items}",
-                        dump=history_dump.id,
-                        n_items=len(history_dump.items))
+            logger.info(
+                "Dump received {dump} n_items:{n_items}",
+                dump=history_dump.id,
+                n_items=len(history_dump.items),
+            )
             history_dump = history_dump.dict()
 
             async for chunk in chunked(
@@ -62,19 +66,17 @@ class HistoryDistributor(Intercom):
                 data = {"data": orjson.dumps(chunk)}
                 yield data
 
-            logger.info("Dump distributed {dump} n_items:{n_items}",
-                        dump=history_dump["id"],
-                        n_items=len(history_dump["items"]))
+            logger.info(
+                "Dump distributed {dump} n_items:{n_items}",
+                dump=history_dump["id"],
+                n_items=len(history_dump["items"]),
+            )
 
 
 if __name__ == "__main__":
     uvloop.install()
 
     distributor = HistoryDistributor.create(
-        "history_dumps",
-        "group",
-        "history_chunks",
-        REDIS_HOST,
-        REDIS_PORT,
+        "history_dumps", "group", "history_chunks", REDIS_HOST, REDIS_PORT,
     )
     run_async(distributor.run())

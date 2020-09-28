@@ -23,8 +23,7 @@ async def bookmark_page(request: Request) -> UJSONResponse:
         raise HTTPException(status_code=400, detail=MALFORMED_JSON_MESSAGE)
     except ValidationError as e:
         raise HTTPException(
-            status_code=400,
-            detail=str(e),
+            status_code=400, detail=str(e),
         )
     return UJSONResponse(response, status_code=HTTP_201_CREATED)
 
@@ -40,7 +39,6 @@ async def get_bookmarks(request: Request) -> UJSONResponse:
         raise HTTPException(status_code=400, detail=MALFORMED_JSON_MESSAGE)
     except ValidationError as e:
         raise HTTPException(
-            status_code=400,
-            detail=str(e),
+            status_code=400, detail=str(e),
         )
     return UJSONResponse(response, status_code=HTTP_201_CREATED)

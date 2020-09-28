@@ -53,16 +53,22 @@ class ScraperDistributor(PeriodicProducer):
             )
 
             if page_visits:
-                pages = {"id": uuid4(), "items": [
-                    {"id": str(page["id"]), "url": page["url"]} for page in page_visits
-                ]}
+                pages = {
+                    "id": uuid4(),
+                    "items": [
+                        {"id": str(page["id"]), "url": page["url"]}
+                        for page in page_visits
+                    ],
+                }
 
                 await self.redis.xadd(
                     self.publish_stream, {"data": orjson.dumps(pages)}
                 )
-                logger.info("Batch of pages sent {batch} n_items:{n_items}",
-                            batch=pages["id"],
-                            n_items=len(pages["items"]))
+                logger.info(
+                    "Batch of pages sent {batch} n_items:{n_items}",
+                    batch=pages["id"],
+                    n_items=len(pages["items"]),
+                )
 
 
 if __name__ == "__main__":

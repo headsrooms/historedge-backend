@@ -34,7 +34,10 @@ async def get_page_visits(request: Request) -> UJSONResponse:
 
 async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
     requested_number_of_pages_to_distribute = int(request.query_params.get("n_pages"))
-    number_of_pages_to_distribute = requested_number_of_pages_to_distribute or await PageVisit.filter(is_processed=False).count()
+    number_of_pages_to_distribute = (
+        requested_number_of_pages_to_distribute
+        or await PageVisit.filter(is_processed=False).count()
+    )
     page_length = min(number_of_pages_to_distribute, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
     offsets = range(0, number_of_pages_to_distribute, page_length)
 
@@ -45,24 +48,29 @@ async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
     for offset in offsets:
         page_visits = await (
             PageVisit.filter(is_processed=False)
-                .prefetch_related("page")
-                .order_by("visited_at")
-                .limit(SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
-                .offset(offset)
-                .values(id="page__id", url="page__url")
+            .prefetch_related("page")
+            .order_by("visited_at")
+            .limit(SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
+            .offset(offset)
+            .values(id="page__id", url="page__url")
         )
 
         if page_visits:
-            pages = {"id": uuid4(), "items": [
-                {"id": str(page["id"]), "url": page["url"]} for page in page_visits
-            ]}
+            pages = {
+                "id": uuid4(),
+                "items": [
+                    {"id": str(page["id"]), "url": page["url"]} for page in page_visits
+                ],
+            }
 
-            await redis.xadd(
-                PAGES_TO_SCRAPE, {"data": orjson.dumps(pages)}
-            )
+            await redis.xadd(PAGES_TO_SCRAPE, {"data": orjson.dumps(pages)})
 
             distributed_item = dict(batch=pages["id"], n_items=len(pages["items"]))
-            logger.info("Batch of pages sent {batch} n_items:{n_items}", **distributed_item)
+            logger.info(
+                "Batch of pages sent {batch} n_items:{n_items}", **distributed_item
+            )
             distributed_items.append(distributed_item)
 
-    return UJSONResponse({"distributed_items": distributed_items}, status_code=HTTP_201_CREATED)
+    return UJSONResponse(
+        {"distributed_items": distributed_items}, status_code=HTTP_201_CREATED
+    )

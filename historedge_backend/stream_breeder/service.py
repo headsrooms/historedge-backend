@@ -35,7 +35,7 @@ async def create_groups():
 
 
 async def main():
-    sleep(10)   # wait for redis
+    sleep(10)  # wait for redis
     await create_streams()
     await create_groups()
 

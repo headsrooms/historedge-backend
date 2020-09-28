@@ -21,8 +21,7 @@ async def create_user(request: Request) -> PlainJSONResponse:
         raise HTTPException(status_code=400, detail=MALFORMED_JSON_MESSAGE)
     except ValidationError as e:
         raise HTTPException(
-            status_code=400,
-            detail=str(e),
+            status_code=400, detail=str(e),
         )
     except IntegrityError:
         raise HTTPException(
