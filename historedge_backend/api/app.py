@@ -1,3 +1,5 @@
+from time import sleep
+
 import uvicorn
 from starlette.applications import Starlette
 from tortoise.contrib.starlette import register_tortoise
@@ -20,13 +22,14 @@ app = Starlette(
 )
 
 init_logging()
-
+sleep(30)
 register_tortoise(
     app,
     db_url=DB_URL,
     modules={"models": ["historedge_backend.models"]},
     generate_schemas=settings.GENERATE_SCHEMAS,
 )
+
 
 if __name__ == "__main__":
     uvicorn.run(app)
