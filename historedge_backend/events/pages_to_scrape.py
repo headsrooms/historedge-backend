@@ -7,10 +7,11 @@ import orjson
 from pydantic import BaseModel
 from pyppeteer.browser import Browser
 from pyppeteer.errors import TimeoutError, PageError, NetworkError
+from pyppeteer.page import Page
 from pyppeteer_stealth import stealth
 
 from historedge_backend.event import RedisEvent
-from historedge_backend.models import PageVisit, Page
+from historedge_backend.models import PageVisit
 from historedge_backend.utils import get_text_content, get_links
 
 
@@ -47,11 +48,15 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
 
     @staticmethod
     async def get_page_content(browser: Page, page: PageToScrape):
-        await browser.goto(page.url, timeout=0)
-        html = await browser.content()
-        content = get_text_content(html)
-        links = get_links(html)
-        await page.save_as_page_visit(content, links)
+        try:
+            await browser.goto(page.url, timeout=0)
+            html = await browser.content()
+        except PageError as e:
+            logger.error(str(e))
+        else:
+            content = get_text_content(html)
+            links = get_links(html)
+            await page.save_as_page_visit(content, links)
 
     @staticmethod
     def convert(data) -> Dict[str, str]:
