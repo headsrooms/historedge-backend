@@ -36,8 +36,12 @@ class ScraperDistributor(PeriodicProducer):
         logger.info(f"Finalizing {str(self)}")
 
     async def create_periodic_event(self):
-        page_visits_count = await PageVisit.all().count()
+        page_visits_count = await PageVisit.filter(is_processed=False).count()
         offsets = range(0, page_visits_count, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
+
+        if not page_visits_count:
+            return
+
         for offset in offsets:
             page_visits = await (
                 PageVisit.filter(is_processed=False)
@@ -48,16 +52,17 @@ class ScraperDistributor(PeriodicProducer):
                 .values(id="page__id", url="page__url")
             )
 
-            pages = {"id": uuid4(), "items": [
-                {"id": str(page["id"]), "url": page["url"]} for page in page_visits
-            ]}
+            if page_visits:
+                pages = {"id": uuid4(), "items": [
+                    {"id": str(page["id"]), "url": page["url"]} for page in page_visits
+                ]}
 
-            await self.redis.xadd(
-                self.publish_stream, {"data": orjson.dumps(pages)}
-            )
-            logger.info("Batch of pages sent {batch} n_items:{n_items}",
-                        batch=pages["id"],
-                        n_items=len(pages["items"]))
+                await self.redis.xadd(
+                    self.publish_stream, {"data": orjson.dumps(pages)}
+                )
+                logger.info("Batch of pages sent {batch} n_items:{n_items}",
+                            batch=pages["id"],
+                            n_items=len(pages["items"]))
 
 
 if __name__ == "__main__":
