@@ -65,7 +65,7 @@ async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
 
             await redis.xadd(PAGES_TO_SCRAPE, {"data": orjson.dumps(pages)})
 
-            distributed_item = dict(batch=pages["id"], n_items=len(pages["items"]))
+            distributed_item = dict(batch=str(pages["id"]), n_items=len(pages["items"]))
             logger.info(
                 "Batch of pages sent {batch} n_items:{n_items}", **distributed_item
             )
