@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from dataclasses import dataclass
 from typing import Dict
 
@@ -17,6 +18,8 @@ class ScraperConsumer(Consumer):
     browser: Browser = None
 
     async def initialize(self):
+        logger.remove()
+        logger.add(sys.stderr, level="DEBUG")
         logger.info(f"Initializing {str(self)}")
         await Tortoise.init(
             db_url=DB_URL, modules={"models": ["historedge_backend.models"]}
