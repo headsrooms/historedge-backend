@@ -8,6 +8,6 @@ spec:
     port: 5432
     targetPort: 5432
   selector:
-    io.kompose.service: db
+    app: db
 status:
   loadBalancer: {}

@@ -1,28 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yml
-    kompose.version: 1.21.0 (992df58d8)
-  creationTimestamp: null
   labels:
-    io.kompose.service: realtime-logger
+    app: realtime-logger
   name: realtime-logger
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: realtime-logger
+      app: realtime-logger
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml
-        kompose.version: 1.21.0 (992df58d8)
-      creationTimestamp: null
       labels:
-        io.kompose.service: realtime-logger
+        app: realtime-logger
     spec:
       containers:
       - args:
@@ -106,9 +98,8 @@ spec:
                 key: SENTRY
                 name: env
         image: headsrooms/historedge
-        imagePullPolicy: ""
+        imagePullPolicy: "Always"
         name: realtime-logger
         resources: {}
       restartPolicy: Always
       serviceAccountName: ""
-status: {}

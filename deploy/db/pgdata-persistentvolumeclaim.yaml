@@ -1,14 +1,26 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pgdata
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /run/desktop/mnt/host/c/Users/Pablo/code/historedge-backend/pgdata
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: pgdata
   name: pgdata
 spec:
+  storageClassName: manual
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
-status: {}
+      storage: 10Gi

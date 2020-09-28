@@ -1,28 +1,14 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yml
-    kompose.version: 1.21.0 (992df58d8)
-  creationTimestamp: null
   labels:
-    io.kompose.service: history-logger
-  name: history-logger
+    app: stream-breeder
+  name: stream-breeder
 spec:
-  replicas: 15
-  selector:
-    matchLabels:
-      io.kompose.service: history-logger
-  strategy:
-    type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml
-        kompose.version: 1.21.0 (992df58d8)
-      creationTimestamp: null
       labels:
-        io.kompose.service: history-logger
+        app: stream-breeder
     spec:
       containers:
       - args:
@@ -30,7 +16,7 @@ spec:
         - run
         - python
         - -m
-        - historedge_backend.history_logger.service
+        - historedge_backend.stream_breeder.service
         env:
           - name: API_WORKERS
             valueFrom:
@@ -106,9 +92,8 @@ spec:
                 key: SENTRY
                 name: env
         image: headsrooms/historedge
-        imagePullPolicy: ""
-        name: history-logger
+        imagePullPolicy: "Always"
+        name: scraper-distributor
         resources: {}
-      restartPolicy: Always
-      serviceAccountName: ""
+      restartPolicy: OnFailure
 status: {}
