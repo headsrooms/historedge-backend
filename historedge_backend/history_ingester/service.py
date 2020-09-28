@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from typing import Dict
 
 from loguru import logger
@@ -21,8 +22,10 @@ from historedge_backend.events.history import HistoryDumpReceived
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 
-class HistoryLogger(Consumer):
+class HistoryIngester(Consumer):
     async def initialize(self):
+        logger.remove()
+        logger.add(sys.stderr, level="DEBUG")
         logger.info(f"Initializing {str(self)}")
         await Tortoise.init(
             db_url=DB_URL, modules={"models": ["historedge_backend.models"]}
@@ -46,5 +49,5 @@ class HistoryLogger(Consumer):
 if __name__ == "__main__":
     uvloop.install()
 
-    logger = HistoryLogger.create("history_chunks", "group", REDIS_HOST, REDIS_PORT)
-    run_async(logger.run())
+    ingester = HistoryIngester.create("history_chunks", "group", REDIS_HOST, REDIS_PORT)
+    run_async(ingester.run())

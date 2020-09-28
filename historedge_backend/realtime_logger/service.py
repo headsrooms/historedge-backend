@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from typing import Dict
 
 from loguru import logger
@@ -23,6 +24,8 @@ DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 class RealtimeLogger(Consumer):
     async def initialize(self):
+        logger.remove()
+        logger.add(sys.stderr, level="DEBUG")
         logger.info(f"Initializing {str(self)}")
         await Tortoise.init(
             db_url=DB_URL, modules={"models": ["historedge_backend.models"]}

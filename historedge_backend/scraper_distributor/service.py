@@ -1,3 +1,4 @@
+import sys
 from uuid import uuid4
 
 import orjson
@@ -24,6 +25,8 @@ DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 class ScraperDistributor(PeriodicProducer):
     async def initialize(self):
+        logger.remove()
+        logger.add(sys.stderr, level="DEBUG")
         logger.info(f"Initializing {str(self)}")
         await Tortoise.init(
             db_url=DB_URL, modules={"models": ["historedge_backend.models"]}

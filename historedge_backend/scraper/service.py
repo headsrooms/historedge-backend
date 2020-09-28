@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass, asdict
 from uuid import uuid4
 
@@ -35,6 +36,9 @@ class Scraper:
         return cls(RedisChannel(stream, group, consumer), redis)
 
     async def initialize(self):
+        logger.remove()
+        logger.add(sys.stderr, level="DEBUG")
+        logger.info(f"Initializing {str(self)}")
         browser = await launch(
             headless=True,
             ignoreHTTPSErrors=True,
