@@ -40,6 +40,7 @@ async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
     )
     page_length = min(number_of_pages_to_distribute, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
     offsets = range(0, number_of_pages_to_distribute, page_length)
+    limit = min(page_length, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
 
     if not number_of_pages_to_distribute:
         return UJSONResponse()
@@ -50,7 +51,7 @@ async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
             PageVisit.filter(is_processed=False)
             .prefetch_related("page")
             .order_by("visited_at")
-            .limit(SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
+            .limit(limit)
             .offset(offset)
             .values(id="page__id", url="page__url")
         )
