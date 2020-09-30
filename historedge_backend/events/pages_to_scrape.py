@@ -53,7 +53,9 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
     @staticmethod
     async def get_page_content(browser: Page, page: PageToScrape):
         try:
-            await browser.goto(page.url, timeout=0)
+            await browser.goto(page.url, timeout=0, waitUntil='networkidle2')
+            await browser.waitForNavigation()
+            await browser.waitForSelector("html")
             html = await browser.content()
         except PageError as e:
             logger.error(str(e))
