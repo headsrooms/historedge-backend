@@ -34,13 +34,14 @@ async def get_page_visits(request: Request) -> UJSONResponse:
 
 async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
     requested_number_of_pages_to_distribute = int(request.query_params.get("n_pages"))
+    requested_chunk_length = int(request.query_params.get("chunk_length"))
     number_of_pages_to_distribute = (
         requested_number_of_pages_to_distribute
         or await PageVisit.filter(is_processed=False).count()
     )
-    page_length = min(number_of_pages_to_distribute, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
-    offsets = range(0, number_of_pages_to_distribute, page_length)
-    limit = min(page_length, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
+    chunk_length = requested_chunk_length or min(number_of_pages_to_distribute, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
+    offsets = range(0, number_of_pages_to_distribute, chunk_length)
+    limit = min(chunk_length, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
 
     if not number_of_pages_to_distribute:
         return UJSONResponse()
