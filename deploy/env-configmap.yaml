@@ -17,6 +17,7 @@ data:
   REDIS_PORT: "6379"
   SCRAPER_DISTRIBUTOR_CHUNK_LENGTH: "1000"
   SENTRY: "False"
+  PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome-unstable"
 kind: ConfigMap
 metadata:
   creationTimestamp: null

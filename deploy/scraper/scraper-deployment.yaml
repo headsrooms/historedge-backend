@@ -24,6 +24,11 @@ spec:
         - -m
         - historedge_backend.scraper.service
         env:
+          - name: PUPPETEER_EXECUTABLE_PATH
+            valueFrom:
+              configMapKeyRef:
+                key: PUPPETEER_EXECUTABLE_PATH
+                name: env
           - name: API_WORKERS
             valueFrom:
               configMapKeyRef:
@@ -97,7 +102,7 @@ spec:
               configMapKeyRef:
                 key: SENTRY
                 name: env
-        image: headsrooms/historedge
+        image: headsrooms/historedge-scraper
         imagePullPolicy: "Always"
         name: scraper
         resources: {}
