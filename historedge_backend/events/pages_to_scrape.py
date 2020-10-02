@@ -7,11 +7,11 @@ import orjson
 from pydantic import BaseModel
 from pyppeteer.browser import Browser
 from pyppeteer.errors import TimeoutError, PageError, NetworkError
-from pyppeteer.page import Page
+from pyppeteer.page import Page as BrowserPage
 from pyppeteer_stealth import stealth
 
 from historedge_backend.event import RedisEvent
-from historedge_backend.models import PageVisit
+from historedge_backend.models import PageVisit, Page
 from historedge_backend.utils import get_text_content, get_links
 
 
@@ -20,10 +20,13 @@ class PageToScrape(BaseModel):
     url: str
 
     async def save_as_page_visit(self, content: str, links: List[str]):
-        links = [(await Page.get_or_create(url=link))[0] for link in links]
         pages = PageVisit.filter(page=self.id, is_processed=False)
-        for page in await pages:
-            await page.links.add(*links)
+
+        if links:
+            links = [(await Page.get_or_create(url=link))[0] for link in links]
+            for page in await pages:
+                await page.links.add(*links)
+
         await pages.update(content=content, is_processed=True)
 
 
@@ -37,13 +40,15 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
             batch=self.id,
             n_items=len(self.items),
         )
-        for page in self.items:
-            try:
-                browser_page = await browser.newPage()
-                await stealth(browser_page)
-                await asyncio.create_task(self.get_page_content(browser_page, page))
-            except (TimeoutError, PageError, NetworkError) as e:
-                logger.exception(str(e))
+
+        browser_page = await browser.newPage()
+        await stealth(browser_page)
+        content_tasks = [self.get_page_content(browser_page, page) for page in self.items]
+        try:
+            await asyncio.gather(*content_tasks)
+        except (TimeoutError, PageError, NetworkError) as e:
+            logger.exception(str(e))
+
         logger.info(
             "Scrape finished {batch} n_items:{n_items}",
             batch=self.id,
@@ -51,15 +56,16 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
         )
 
     @staticmethod
-    async def get_page_content(browser: Page, page: PageToScrape):
+    async def get_page_content(browser: BrowserPage, page: PageToScrape):
         try:
-            await browser.goto(page.url, timeout=0, waitUntil='networkidle2')
-            await browser.waitForNavigation()
+            await browser.goto(page.url, timeout=0, waitUntil='load')
             await browser.waitForSelector("html")
-            html = await browser.content()
         except PageError as e:
             logger.error(str(e))
+        except TimeoutError as e:
+            logger.info(str(e))
         else:
+            html = await browser.content()
             content = get_text_content(html)
             links = get_links(html)
             await page.save_as_page_visit(content, links)
