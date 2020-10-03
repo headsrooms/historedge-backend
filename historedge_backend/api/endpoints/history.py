@@ -1,4 +1,3 @@
-import asyncio
 from json import JSONDecodeError
 
 import orjson
@@ -17,9 +16,7 @@ async def register_history(request: Request) -> UJSONResponse:
     except JSONDecodeError:
         raise HTTPException(status_code=400, detail=MALFORMED_JSON_MESSAGE)
     else:
-        asyncio.create_task(
-            redis.xadd("history_dumps", {"data": orjson.dumps(history)})
-        )
+        await redis.xadd("history_dumps", {"data": orjson.dumps(history)})
         return UJSONResponse(
             {"detail": "History received"}, status_code=HTTP_201_CREATED
         )

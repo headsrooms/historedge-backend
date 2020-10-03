@@ -36,4 +36,4 @@ class ScraperConsumer(Consumer):
             if event and "opening" not in event:
                 logger.exception(str(e))
         else:
-            asyncio.create_task(pages.scrape(self.browser))
+            await pages.scrape(self.browser)

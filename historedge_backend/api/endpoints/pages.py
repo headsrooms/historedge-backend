@@ -1,8 +1,7 @@
-import asyncio
 from json import JSONDecodeError
 
-from loguru import logger
 import orjson
+from loguru import logger
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
@@ -29,7 +28,7 @@ async def visit_page(request: Request) -> UJSONResponse:
             status_code=400, detail="Cannot serialize request",
         )
     else:
-        asyncio.create_task(redis.xadd("realtime_pages", response))
+        await redis.xadd("realtime_pages", response)
         return UJSONResponse(response, status_code=HTTP_201_CREATED)
 
 

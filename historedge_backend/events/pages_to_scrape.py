@@ -2,8 +2,8 @@ import asyncio
 from typing import List, Dict
 from uuid import UUID
 
-from loguru import logger
 import orjson
+from loguru import logger
 from pydantic import BaseModel
 from pyppeteer.browser import Browser
 from pyppeteer.errors import TimeoutError, PageError, NetworkError
@@ -41,9 +41,7 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
             n_items=len(self.items),
         )
 
-        browser_page = await browser.newPage()
-        await stealth(browser_page)
-        content_tasks = [self.get_page_content(browser_page, page) for page in self.items]
+        content_tasks = [self.get_page_content(await browser.newPage(), page) for page in self.items]
         try:
             await asyncio.gather(*content_tasks)
         except (TimeoutError, PageError, NetworkError) as e:
@@ -58,7 +56,8 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
     @staticmethod
     async def get_page_content(browser: BrowserPage, page: PageToScrape):
         try:
-            await browser.goto(page.url, timeout=0, waitUntil='load')
+            await stealth(browser)
+            await browser.goto(page.url, timeout=30_000, waitUntil="networkidle2")
             await browser.waitForSelector("html")
         except PageError as e:
             logger.error(str(e))
@@ -66,6 +65,7 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
             logger.info(str(e))
         else:
             html = await browser.content()
+            await browser.close()
             content = get_text_content(html)
             links = get_links(html)
             await page.save_as_page_visit(content, links)

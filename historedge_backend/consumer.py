@@ -51,9 +51,11 @@ class Consumer(ABC):
         await self.initialize()
         try:
             stream_idx = {self.channel.stream: ">"}
+            handle_tasks = []
             while True:
                 async for event in self.get_events(stream_idx):
                     if event:
-                        asyncio.create_task(self.handle_event(event))
+                        handle_tasks.append(self.handle_event(event))
+                await asyncio.gather(*handle_tasks)
         finally:
             await self.finalize()

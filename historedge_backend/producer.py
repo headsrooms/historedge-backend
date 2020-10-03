@@ -34,7 +34,7 @@ class Producer(ABC):
         try:
             while True:
                 event = await self.create_event()
-                await asyncio.create_task(self.publish(event))
+                await self.publish(event)
         finally:
             await self.finalize()
 
