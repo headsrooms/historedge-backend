@@ -7,7 +7,7 @@ authors = ["Pablo Cabezas <headsrooms@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 starlette = "^0.13"
-uvicorn = "^0.11"
+uvicorn = "^0.12"
 jinja2 = "^2.11"
 pyyaml = "^5.3"
 ujson = "^3.2"
@@ -17,24 +17,25 @@ pydantic = "^1.6"
 uvloop = "^0.14"
 asyncpg = "^0.21"
 aredis = "^1.1"
-tortoise-orm = "^0.16"
-orjson = "^3.3"
+orjson = "^3.4"
 pyppeteer = { git = "https://github.com/pyppeteer/pyppeteer", rev = "dev" }
-selectolax = "^0.2.7"
-pyppeteer_stealth = "^1.0"
+selectolax = "^0.2"
+pyppeteer_stealth = "^2.6"
 aioitertools = "^0.7"
-loguru = "^0.5.3"
+loguru = "^0.5"
+httptools = "^0.1"
+tortoise-orm = {extras = ["accel"], version = "^0.16"}
 
 [tool.poetry.dev-dependencies]
 pytest = { version = "^6.0.0-rc", allow-prereleases = true }
-pytest-asyncio = "^0.14.0"
-Faker = "^4.1.1"
-asynctest = "^0.13.0"
-pytest-cov = "^2.10.0"
-safety = "^1.9.0"
-httpx = "^0.14.3"
-asgi-lifespan = "^1.0.1"
-pylint = "^2.6.0"
+pytest-asyncio = "^0.14"
+Faker = "^4.1"
+asynctest = "^0.13"
+pytest-cov = "^2.10"
+safety = "^1.9"
+httpx = "^0.14"
+asgi-lifespan = "^1.0"
+pylint = "^2.6"
 
 [build-system]
 requires = ["poetry>=0.12"]
