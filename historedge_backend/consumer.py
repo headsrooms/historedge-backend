@@ -51,8 +51,8 @@ class Consumer(ABC):
         await self.initialize()
         try:
             stream_idx = {self.channel.stream: ">"}
-            handle_tasks = []
             while True:
+                handle_tasks = []
                 async for event in self.get_events(stream_idx):
                     if event:
                         handle_tasks.append(self.handle_event(event))
