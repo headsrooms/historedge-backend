@@ -1,4 +1,3 @@
-import asyncio
 import sys
 from dataclasses import dataclass
 from typing import Dict
@@ -8,9 +7,9 @@ from pydantic import ValidationError
 from pyppeteer.browser import Browser
 from tortoise import Tortoise
 
-from historedge_backend.settings import DB_URL
 from historedge_backend.consumer import Consumer
 from historedge_backend.events.pages_to_scrape import BatchOfPagesToScrapeReceived
+from historedge_backend.settings import DB_URL
 
 
 @dataclass(frozen=True)
@@ -28,6 +27,7 @@ class ScraperConsumer(Consumer):
     async def finalize(self):
         logger.info(f"Finalizing {str(self)}")
         await self.browser.close()
+        await Tortoise.close_connections()
 
     async def handle_event(self, event: Dict[bytes, bytes]):
         try:

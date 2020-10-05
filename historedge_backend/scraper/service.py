@@ -1,13 +1,15 @@
+import asyncio
 import sys
 from dataclasses import dataclass, asdict
 from uuid import uuid4
 
-from loguru import logger
 import uvloop
 from aredis import StrictRedis
+from loguru import logger
 from pyppeteer import launch
-from tortoise import run_async
 
+from historedge_backend.channel import RedisChannel
+from historedge_backend.scraper.consumer import ScraperConsumer
 from historedge_backend.settings import (
     DB_USER,
     DB_PASSWORD,
@@ -17,8 +19,6 @@ from historedge_backend.settings import (
     REDIS_HOST,
     REDIS_PORT,
 )
-from historedge_backend.channel import RedisChannel
-from historedge_backend.scraper.consumer import ScraperConsumer
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -72,4 +72,4 @@ if __name__ == "__main__":
     uvloop.install()
 
     scraper = Scraper.create("pages_to_scrape", "group", REDIS_HOST, REDIS_PORT)
-    run_async(scraper.run())
+    asyncio.run(scraper.run())
