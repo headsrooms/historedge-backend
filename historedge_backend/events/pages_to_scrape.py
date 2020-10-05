@@ -12,6 +12,8 @@ from historedge_backend.event import RedisEvent
 from historedge_backend.models import PageVisit, Page
 from historedge_backend.utils import get_text_content, get_links
 
+BROWSER_TIMEOUT = 25_000
+WAIT_AFTER_BROWSE = 3_000
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, ' \
             'like Gecko) Chrome/83.0.4103.97 Safari/537.36'
 
@@ -62,14 +64,14 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
         browser = await browser.newPage()
         await browser.setUserAgent(USER_AGENT)
         try:
-            response = await browser.goto(page.url, timeout=45_000, waitUntil="networkidle2")
+            response = await browser.goto(page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2")
         except PageError as e:
             logger.error(str(e))
         except TimeoutError as e:
             logger.info(str(e))
         else:
             if response and response.status < 400:
-                await browser.waitFor(3000)
+                await browser.waitFor(WAIT_AFTER_BROWSE)
                 html = await browser.content()
                 content = get_text_content(html)
                 links = get_links(html)
