@@ -25,6 +25,7 @@ aioitertools = "^0.7"
 loguru = "^0.5"
 httptools = "^0.1"
 tortoise-orm = {extras = ["accel"], version = "^0.16"}
+aiometer = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = { version = "^6.0.0-rc", allow-prereleases = true }

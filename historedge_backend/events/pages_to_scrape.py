@@ -1,18 +1,19 @@
-import asyncio
-from typing import List, Dict
+from typing import List, Dict, NamedTuple
 from uuid import UUID
 
+import aiometer
 import orjson
 from loguru import logger
 from pydantic import BaseModel
 from pyppeteer.browser import Browser
 from pyppeteer.errors import TimeoutError, PageError, NetworkError
-from pyppeteer.page import Page as BrowserPage
-from pyppeteer_stealth import stealth
 
 from historedge_backend.event import RedisEvent
 from historedge_backend.models import PageVisit, Page
 from historedge_backend.utils import get_text_content, get_links
+
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, ' \
+            'like Gecko) Chrome/83.0.4103.97 Safari/537.36'
 
 
 class PageToScrape(BaseModel):
@@ -41,10 +42,12 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
             n_items=len(self.items),
         )
 
-        content_tasks = [self.get_page_content(await browser.newPage(), page) for page in self.items]
+        browser_pages = [BrowserAndPage(browser, page) for page in self.items]
         try:
-            await asyncio.gather(*content_tasks)
+            await aiometer.run_on_each(self.get_page_content, browser_pages, max_at_once=10)
         except (TimeoutError, PageError, NetworkError) as e:
+            logger.exception(str(e))
+        except Exception as e:
             logger.exception(str(e))
 
         logger.info(
@@ -54,21 +57,25 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
         )
 
     @staticmethod
-    async def get_page_content(browser: BrowserPage, page: PageToScrape):
+    async def get_page_content(browser_page: "BrowserAndPage"):
+        browser, page = browser_page
+        browser = await browser.newPage()
+        await browser.setUserAgent(USER_AGENT)
         try:
-            await stealth(browser)
-            await browser.goto(page.url, timeout=30_000, waitUntil="networkidle2")
-            await browser.waitForSelector("html")
+            response = await browser.goto(page.url, timeout=45_000, waitUntil="networkidle2")
         except PageError as e:
             logger.error(str(e))
         except TimeoutError as e:
             logger.info(str(e))
         else:
-            html = await browser.content()
+            if response and response.status < 400:
+                await browser.waitFor(3000)
+                html = await browser.content()
+                content = get_text_content(html)
+                links = get_links(html)
+                await page.save_as_page_visit(content, links)
+        finally:
             await browser.close()
-            content = get_text_content(html)
-            links = get_links(html)
-            await page.save_as_page_visit(content, links)
 
     @staticmethod
     def convert(data) -> Dict[str, str]:
@@ -79,3 +86,8 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
         data = data.get("data")
         if data:
             return orjson.loads(data)
+
+
+class BrowserAndPage(NamedTuple):
+    browser: Browser
+    page: PageToScrape
