@@ -12,8 +12,11 @@ from historedge_backend.event import RedisEvent
 from historedge_backend.models import PageVisit, Page
 from historedge_backend.utils import get_text_content, get_links
 
+MAX_AT_ONCE = 20
+
 BROWSER_TIMEOUT = 25_000
 WAIT_AFTER_BROWSE = 3_000
+
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, ' \
             'like Gecko) Chrome/83.0.4103.97 Safari/537.36'
 
@@ -46,7 +49,7 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
 
         browser_pages = [BrowserAndPage(browser, page) for page in self.items]
         try:
-            await aiometer.run_on_each(self.get_page_content, browser_pages, max_at_once=10)
+            await aiometer.run_on_each(self.get_page_content, browser_pages, max_at_once=MAX_AT_ONCE)
         except (TimeoutError, PageError, NetworkError) as e:
             logger.exception(str(e))
         except Exception as e:
