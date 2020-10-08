@@ -70,7 +70,7 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
             response = await browser.goto(page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2")
         except PageError as e:
             logger.error(str(e))
-        except TimeoutError as e:
+        except (TimeoutError, NetworkError) as e:
             logger.info(str(e))
         else:
             if response and response.status < 400:
