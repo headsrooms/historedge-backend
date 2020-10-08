@@ -21,7 +21,8 @@ from historedge_backend.settings import (
 )
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, ' \
+            'like Gecko) Chrome/83.0.4103.97 Safari/537.36'
 
 @dataclass
 class Scraper:
@@ -51,7 +52,7 @@ class Scraper:
                 "--no-zygote",
                 "--window-position=0,0",
                 "--ignore-certificate-errors-spki-list",
-                '--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36',
+                USER_AGENT,
             ],
         )
 
