@@ -17,9 +17,6 @@ MAX_AT_ONCE = 20
 BROWSER_TIMEOUT = 25_000
 WAIT_AFTER_BROWSE = 3_000
 
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, ' \
-            'like Gecko) Chrome/83.0.4103.97 Safari/537.36'
-
 
 class PageToScrape(BaseModel):
     id: str
@@ -65,7 +62,6 @@ class BatchOfPagesToScrapeReceived(RedisEvent):
     async def get_page_content(browser_page: "BrowserAndPage"):
         browser, page = browser_page
         browser = await browser.newPage()
-        await browser.setUserAgent(USER_AGENT)
         try:
             response = await browser.goto(page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2")
         except PageError as e:
