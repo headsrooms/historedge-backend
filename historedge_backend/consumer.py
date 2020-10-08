@@ -56,6 +56,7 @@ class Consumer(ABC):
                 async for event in self.get_events(stream_idx):
                     if event:
                         handle_tasks.append(self.handle_event(event))
-                await asyncio.gather(*handle_tasks)
+                if handle_tasks:
+                    await asyncio.gather(*handle_tasks)
         finally:
             await self.finalize()
