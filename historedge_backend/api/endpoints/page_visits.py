@@ -46,7 +46,7 @@ async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
     if not number_of_pages_to_distribute:
         return UJSONResponse()
 
-    distributed_items = []
+    page_visits = []
     for offset in offsets:
         page_visits = await (
             PageVisit.filter(is_processed=False)
@@ -58,21 +58,13 @@ async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
         )
 
         if page_visits:
-            pages = {
-                "id": uuid4(),
-                "items": [
-                    {"id": str(page["id"]), "url": page["url"]} for page in page_visits
-                ],
-            }
+            for page in page_visits:
+                await redis.xadd(PAGES_TO_SCRAPE, {"id": str(page["id"]), "url": page["url"]})
 
-            await redis.xadd(PAGES_TO_SCRAPE, {"data": orjson.dumps(pages)})
-
-            distributed_item = dict(batch=str(pages["id"]), n_items=len(pages["items"]))
             logger.info(
-                "Batch of pages sent {batch} n_items:{n_items}", **distributed_item
+                "Batch of pages sent n_items:{n_items}", n_items=len(page_visits)
             )
-            distributed_items.append(distributed_item)
 
     return UJSONResponse(
-        {"distributed_items": distributed_items}, status_code=HTTP_201_CREATED
+        {"n_items": len(page_visits)}, status_code=HTTP_201_CREATED
     )
