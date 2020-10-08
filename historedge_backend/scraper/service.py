@@ -41,7 +41,7 @@ class Scraper:
         logger.add(sys.stderr, level="DEBUG")
         logger.info(f"Initializing {str(self)}")
         browser = await launch(
-            headless=True,
+            headless=False,
             ignoreHTTPSErrors=True,
             args=[
                 "--no-sandbox",
