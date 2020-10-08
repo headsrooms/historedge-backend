@@ -5,7 +5,7 @@ description = "Historedge backend"
 authors = ["Pablo Cabezas <headsrooms@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 starlette = "^0.13"
 uvicorn = "^0.12"
 jinja2 = "^2.11"
