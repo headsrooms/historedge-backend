@@ -8,7 +8,7 @@ from pyppeteer.browser import Browser
 from tortoise import Tortoise
 
 from historedge_backend.consumer import Consumer
-from historedge_backend.events.pages_to_scrape import BatchOfPagesToScrapeReceived
+from historedge_backend.events.pages_to_scrape import PageToScrape
 from historedge_backend.settings import DB_URL
 
 
@@ -31,9 +31,9 @@ class ScraperConsumer(Consumer):
 
     async def handle_event(self, event: Dict[bytes, bytes]):
         try:
-            pages = BatchOfPagesToScrapeReceived.deserialize(event)
+            page = PageToScrape.deserialize(event)
         except ValidationError as e:
             if event and "opening" not in event:
                 logger.exception(str(e))
         else:
-            await pages.scrape(self.browser)
+            await page.scrape(self.browser, self.stealth_activated)

@@ -34,36 +34,29 @@ async def get_page_visits(request: Request) -> UJSONResponse:
 
 async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
     requested_number_of_pages_to_distribute = int(request.query_params.get("n_pages"))
-    requested_chunk_length = int(request.query_params.get("chunk_length"))
-    number_of_pages_to_distribute = (
+    limit = (
         requested_number_of_pages_to_distribute
         or await PageVisit.filter(is_processed=False).count()
     )
-    chunk_length = requested_chunk_length or min(number_of_pages_to_distribute, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
-    offsets = range(0, number_of_pages_to_distribute, chunk_length)
-    limit = min(chunk_length, SCRAPER_DISTRIBUTOR_CHUNK_LENGTH)
 
-    if not number_of_pages_to_distribute:
+    if not limit:
         return UJSONResponse()
 
-    page_visits = []
-    for offset in offsets:
-        page_visits = await (
-            PageVisit.filter(is_processed=False)
-            .prefetch_related("page")
-            .order_by("visited_at")
-            .limit(limit)
-            .offset(offset)
-            .values(id="page__id", url="page__url")
+    page_visits = await (
+        PageVisit.filter(is_processed=False)
+        .prefetch_related("page")
+        .order_by("visited_at")
+        .limit(limit)
+        .values(id="page__id", url="page__url")
+    ) or []
+
+    if page_visits:
+        for page in page_visits:
+            await redis.xadd(PAGES_TO_SCRAPE, {"id": str(page["id"]), "url": page["url"]})
+
+        logger.info(
+            "Batch of pages sent n_items:{n_items}", n_items=len(page_visits)
         )
-
-        if page_visits:
-            for page in page_visits:
-                await redis.xadd(PAGES_TO_SCRAPE, {"id": str(page["id"]), "url": page["url"]})
-
-            logger.info(
-                "Batch of pages sent n_items:{n_items}", n_items=len(page_visits)
-            )
 
     return UJSONResponse(
         {"n_items": len(page_visits)}, status_code=HTTP_201_CREATED
