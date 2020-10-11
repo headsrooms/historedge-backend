@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import sys
 from dataclasses import dataclass, asdict
 from uuid import uuid4
@@ -17,12 +18,11 @@ from historedge_backend.settings import (
     DB_PORT,
     DB_NAME,
     REDIS_HOST,
-    REDIS_PORT,
+    REDIS_PORT, HEADLESS, BROWSER_ARGS, SCRAPER_ITEMS_PER_READ, SCRAPER_STEALTH,
 )
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, ' \
-            'like Gecko) Chrome/83.0.4103.97 Safari/537.36'
+
 
 @dataclass
 class Scraper:
@@ -43,19 +43,11 @@ class Scraper:
         logger.add(sys.stderr, level="DEBUG")
         logger.info(f"Initializing {str(self)}")
         browser = await launch(
-            headless=False,
+            headless=HEADLESS,
+            autoClose=False,
+            logLevel=logging.INFO,
             ignoreHTTPSErrors=True,
-            args=[
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--single-process",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--no-zygote",
-                "--window-position=0,0",
-                "--ignore-certificate-errors-spki-list",
-                USER_AGENT,
-            ],
+            args=BROWSER_ARGS,
         )
 
         self.consumer = ScraperConsumer(

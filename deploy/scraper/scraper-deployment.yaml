@@ -92,10 +92,20 @@ spec:
             value: $(REDIS_SERVICE_HOST)
           - name: REDIS_PORT
             value: $(REDIS_SERVICE_PORT)
-          - name: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
+          - name: HEADLESS
             valueFrom:
               configMapKeyRef:
-                key: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
+                key: HEADLESS
+                name: env
+          - name: SCRAPER_ITEMS_PER_READ
+            valueFrom:
+              configMapKeyRef:
+                key: SCRAPER_ITEMS_PER_READ
+                name: env
+          - name: SCRAPER_STEALTH
+            valueFrom:
+              configMapKeyRef:
+                key: SCRAPER_STEALTH
                 name: env
           - name: SENTRY
             valueFrom:

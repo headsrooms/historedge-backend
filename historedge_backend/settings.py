@@ -40,3 +40,21 @@ if DEBUG:
     DB_URL = "sqlite://db.sqlite"
 else:
     DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+HEADLESS = config("HEADLESS", cast=bool, default=True)
+SCRAPER_ITEMS_PER_READ = config("SCRAPER_ITEMS_PER_READ", cast=int, default=5)
+SCRAPER_STEALTH = config("SCRAPER_STEALTH", cast=bool, default=False)
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, ' \
+            'like Gecko) Chrome/83.0.4103.97 Safari/537.36'
+BROWSER_ARGS = [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--single-process",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--mute-audio",
+    "--no-zygote",
+    "--window-position=0,0",
+    "--ignore-certificate-errors-spki-list",
+    USER_AGENT,
+]

@@ -15,9 +15,11 @@ data:
   POSTGRES_USER: postgres
   REDIS_HOST: redis
   REDIS_PORT: "6379"
-  SCRAPER_DISTRIBUTOR_CHUNK_LENGTH: "1000"
   SENTRY: "False"
   PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome-unstable"
+  HEADLESS: "False"
+  SCRAPER_ITEMS_PER_READ: "5"
+  SCRAPER_STEALTH: "True"
 kind: ConfigMap
 metadata:
   creationTimestamp: null
