@@ -3,6 +3,7 @@ from typing import List
 from loguru import logger
 from pyppeteer.browser import Browser
 from pyppeteer.errors import TimeoutError, PageError, NetworkError
+from pyppeteer_stealth import stealth
 
 from historedge_backend.event import RedisEvent
 from historedge_backend.models import PageVisit, Page
@@ -50,9 +51,11 @@ class PageToScrape(RedisEvent):
         )
 
     @staticmethod
-    async def get_page_content(browser_page: "BrowserAndPage"):
-        browser, page = browser_page
-        browser = await browser.newPage()
+    async def get_page_content(browser: Browser, page: "PageToScrape", stealth_activated: bool = False):
+        browser_page = await browser.newPage()
+
+        if stealth_activated:
+            await stealth(browser_page)
         try:
             response = await browser_page.goto(page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2")
         except (TimeoutError, NetworkError, PageError) as e:
