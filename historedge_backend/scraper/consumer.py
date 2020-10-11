@@ -15,6 +15,7 @@ from historedge_backend.settings import DB_URL
 @dataclass(frozen=True)
 class ScraperConsumer(Consumer):
     browser: Browser = None
+    stealth_activated: bool = False
 
     async def initialize(self):
         logger.remove()
