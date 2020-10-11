@@ -28,6 +28,7 @@ class PageVisit(Model):
     title = fields.TextField(null=True)
     content = fields.TextField(null=True)
     is_processed = fields.BooleanField(default=True)
+    processing_error = fields.TextField(null=True)
     page: fields.ForeignKeyRelation[Page] = fields.ForeignKeyField(
         "models.Page", related_name="visits"
     )

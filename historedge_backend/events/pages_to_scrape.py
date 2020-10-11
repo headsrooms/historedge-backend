@@ -16,6 +16,10 @@ class PageToScrape(RedisEvent):
     id: str
     url: str
 
+    async def save_as_failing_page(self, error: str):
+        pages = PageVisit.filter(page=self.id, is_processed=False)
+        await pages.update(is_processed=True, processing_error=error)
+
     async def save_as_page_visit(self, content: str, links: List[str]):
         pages = PageVisit.filter(page=self.id, is_processed=False)
 
@@ -53,6 +57,7 @@ class PageToScrape(RedisEvent):
             response = await browser_page.goto(page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2")
         except (TimeoutError, NetworkError, PageError) as e:
             logger.info(str(e))
+            await page.save_as_failing_page(str(e))
         else:
             if response and response.status < 400:
                 await browser_page.waitFor(WAIT_AFTER_BROWSE)
