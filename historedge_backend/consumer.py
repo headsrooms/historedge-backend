@@ -13,12 +13,13 @@ from historedge_backend.channel import RedisChannel
 class Consumer(ABC):
     channel: RedisChannel
     redis: StrictRedis
+    items_per_read: int = 10
 
     @classmethod
-    def create(cls, stream: str, group: str, redis_host: str, redis_port: int):
+    def create(cls, stream: str, group: str, redis_host: str, redis_port: int, items_per_read: int = 10):
         consumer = f"{str(cls.__name__)}-{str(uuid4())}"
         redis = StrictRedis(host=redis_host, port=redis_port)
-        return cls(RedisChannel(stream, group, consumer), redis)
+        return cls(RedisChannel(stream, group, consumer), redis, items_per_read)
 
     @abstractmethod
     async def initialize(self):
@@ -34,7 +35,7 @@ class Consumer(ABC):
 
     async def get_events(self, stream_idx) -> AsyncIterable[Dict[bytes, bytes]]:
         events = await self.redis.xreadgroup(
-            self.channel.group, self.channel.consumer, **stream_idx
+            self.channel.group, self.channel.consumer, self.items_per_read, **stream_idx
         )
         async for event in self.slice(events):
             yield event
