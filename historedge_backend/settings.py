@@ -30,7 +30,6 @@ DB_PORT = config("POSTGRES_PORT", cast=str)
 DB_NAME = config("POSTGRES_DB", cast=str)
 
 HISTORY_DISTRIBUTOR_CHUNK_LENGTH = config("HISTORY_DISTRIBUTOR_CHUNK_LENGTH", cast=int)
-SCRAPER_DISTRIBUTOR_CHUNK_LENGTH = config("SCRAPER_DISTRIBUTOR_CHUNK_LENGTH", cast=int)
 
 if SENTRY_DSN:  # pragma: nocover
     import sentry_sdk
