@@ -1,28 +1,27 @@
-from uuid import uuid4
-
 import orjson
+from loguru import logger
 from starlette.requests import Request
 from starlette.responses import UJSONResponse
-from loguru import logger
 from starlette.status import HTTP_201_CREATED
 
 from historedge_backend.api.resources import redis
 from historedge_backend.models import PageVisit
 from historedge_backend.schemas import OutputPageVisitListSchema
-from historedge_backend.settings import SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
 
 PAGES_TO_SCRAPE = "pages_to_scrape"
 
 
 async def get_page_visits(request: Request) -> UJSONResponse:
     is_processed = request.query_params.get("is_processed")
+    without_errors = request.query_params.get("without_errors")
     page = int(request.query_params.get("page", 1))
     page_size = int(request.query_params.get("page_size", 10))
     offset = (page - 1) * page_size if page != 1 else 0
 
-    if is_processed:
+    if is_processed or without_errors:
         is_processed = is_processed == "true" or is_processed == "True"
-        pages = PageVisit.filter(is_processed=is_processed)
+        without_errors = without_errors == "true" or without_errors == "True"
+        pages = PageVisit.filter(is_processed=is_processed, processing_error__isnull=without_errors)
     else:
         pages = PageVisit.all()
     count = await pages.count()
