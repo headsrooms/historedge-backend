@@ -55,17 +55,10 @@ class Scraper:
             stealth_activated=stealth_activated,
         )
 
-    async def initialize(self):
+    async def initialize(self, browser):
         logger.remove()
         logger.add(sys.stderr, level="DEBUG")
         logger.info(f"Initializing {str(self)}")
-        browser = await launch(
-            headless=HEADLESS,
-            autoClose=False,
-            logLevel=logging.INFO,
-            ignoreHTTPSErrors=True,
-            args=BROWSER_ARGS,
-        )
 
         self.consumer = ScraperConsumer(
             RedisChannel(**asdict(self.subscribe_channel)),
@@ -79,7 +72,15 @@ class Scraper:
         logger.info(f"Finalizing {str(self)}")
 
     async def run(self):
-        await self.initialize()
+        browser = await launch(
+            headless=HEADLESS,
+            autoClose=False,
+            logLevel=logging.INFO,
+            ignoreHTTPSErrors=True,
+            args=BROWSER_ARGS,
+        )
+
+        await self.initialize(browser)
         await self.consumer.run()
         await self.finalize()
 
