@@ -16,7 +16,14 @@ class Consumer(ABC):
     items_per_read: int = 10
 
     @classmethod
-    def create(cls, stream: str, group: str, redis_host: str, redis_port: int, items_per_read: int = 10):
+    def create(
+        cls,
+        stream: str,
+        group: str,
+        redis_host: str,
+        redis_port: int,
+        items_per_read: int = 10,
+    ):
         consumer = f"{str(cls.__name__)}-{str(uuid4())}"
         redis = StrictRedis(host=redis_host, port=redis_port)
         return cls(RedisChannel(stream, group, consumer), redis, items_per_read)

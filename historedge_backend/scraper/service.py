@@ -18,7 +18,11 @@ from historedge_backend.settings import (
     DB_PORT,
     DB_NAME,
     REDIS_HOST,
-    REDIS_PORT, HEADLESS, BROWSER_ARGS, SCRAPER_ITEMS_PER_READ, SCRAPER_STEALTH,
+    REDIS_PORT,
+    HEADLESS,
+    BROWSER_ARGS,
+    SCRAPER_ITEMS_PER_READ,
+    SCRAPER_STEALTH,
 )
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
@@ -33,10 +37,23 @@ class Scraper:
     stealth_activated: bool = False
 
     @classmethod
-    def create(cls, stream: str, group: str, redis_host: str, redis_port: int, items_per_read: int = 10, stealth_activated: bool = False):
+    def create(
+        cls,
+        stream: str,
+        group: str,
+        redis_host: str,
+        redis_port: int,
+        items_per_read: int = 10,
+        stealth_activated: bool = False,
+    ):
         consumer = f"{str(cls.__name__)}-{str(uuid4())}"
         redis = StrictRedis(host=redis_host, port=redis_port)
-        return cls(RedisChannel(stream, group, consumer), redis, items_per_read=items_per_read, stealth_activated=stealth_activated)
+        return cls(
+            RedisChannel(stream, group, consumer),
+            redis,
+            items_per_read=items_per_read,
+            stealth_activated=stealth_activated,
+        )
 
     async def initialize(self):
         logger.remove()
@@ -51,7 +68,11 @@ class Scraper:
         )
 
         self.consumer = ScraperConsumer(
-            RedisChannel(**asdict(self.subscribe_channel)), self.redis, self.items_per_read, browser=browser, stealth_activated=self.stealth_activated
+            RedisChannel(**asdict(self.subscribe_channel)),
+            self.redis,
+            self.items_per_read,
+            browser=browser,
+            stealth_activated=self.stealth_activated,
         )
 
     async def finalize(self):
@@ -66,5 +87,12 @@ class Scraper:
 if __name__ == "__main__":
     uvloop.install()
 
-    scraper = Scraper.create("pages_to_scrape", "group", REDIS_HOST, REDIS_PORT, SCRAPER_ITEMS_PER_READ, SCRAPER_STEALTH)
+    scraper = Scraper.create(
+        "pages_to_scrape",
+        "group",
+        REDIS_HOST,
+        REDIS_PORT,
+        SCRAPER_ITEMS_PER_READ,
+        SCRAPER_STEALTH,
+    )
     asyncio.run(scraper.run())

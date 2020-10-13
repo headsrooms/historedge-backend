@@ -21,7 +21,9 @@ async def get_page_visits(request: Request) -> UJSONResponse:
     if is_processed or without_errors:
         is_processed = is_processed == "true" or is_processed == "True"
         without_errors = without_errors == "true" or without_errors == "True"
-        pages = PageVisit.filter(is_processed=is_processed, processing_error__isnull=without_errors)
+        pages = PageVisit.filter(
+            is_processed=is_processed, processing_error__isnull=without_errors
+        )
     else:
         pages = PageVisit.all()
     count = await pages.count()
@@ -41,22 +43,23 @@ async def distribute_page_visits_to_scraper(request: Request) -> UJSONResponse:
     if not limit:
         return UJSONResponse()
 
-    page_visits = await (
-        PageVisit.filter(is_processed=False)
-        .prefetch_related("page")
-        .order_by("visited_at")
-        .limit(limit)
-        .values(id="page__id", url="page__url")
-    ) or []
+    page_visits = (
+        await (
+            PageVisit.filter(is_processed=False)
+            .prefetch_related("page")
+            .order_by("visited_at")
+            .limit(limit)
+            .values(id="page__id", url="page__url")
+        )
+        or []
+    )
 
     if page_visits:
         for page in page_visits:
-            await redis.xadd(PAGES_TO_SCRAPE, {"id": str(page["id"]), "url": page["url"]})
+            await redis.xadd(
+                PAGES_TO_SCRAPE, {"id": str(page["id"]), "url": page["url"]}
+            )
 
-        logger.info(
-            "Batch of pages sent n_items:{n_items}", n_items=len(page_visits)
-        )
+        logger.info("Batch of pages sent n_items:{n_items}", n_items=len(page_visits))
 
-    return UJSONResponse(
-        {"n_items": len(page_visits)}, status_code=HTTP_201_CREATED
-    )
+    return UJSONResponse({"n_items": len(page_visits)}, status_code=HTTP_201_CREATED)

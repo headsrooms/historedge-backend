@@ -33,8 +33,7 @@ class PageToScrape(RedisEvent):
 
     async def scrape(self, browser: Browser, stealth_activated: bool = False):
         logger.info(
-            "Before scraping {id} url:{url}",
-            **self.dict(),
+            "Before scraping {id} url:{url}", **self.dict(),
         )
 
         try:
@@ -46,18 +45,21 @@ class PageToScrape(RedisEvent):
             logger.exception(str(e))
 
         logger.info(
-            "Scrape finished {id} url:{url}",
-            **self.dict(),
+            "Scrape finished {id} url:{url}", **self.dict(),
         )
 
     @staticmethod
-    async def get_page_content(browser: Browser, page: "PageToScrape", stealth_activated: bool = False):
+    async def get_page_content(
+        browser: Browser, page: "PageToScrape", stealth_activated: bool = False
+    ):
         browser_page = await browser.newPage()
 
         if stealth_activated:
             await stealth(browser_page)
         try:
-            response = await browser_page.goto(page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2")
+            response = await browser_page.goto(
+                page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2"
+            )
         except (TimeoutError, NetworkError, PageError) as e:
             logger.info(str(e))
             await page.save_as_failing_page(str(e))
