@@ -85,11 +85,6 @@ spec:
             configMapKeyRef:
               key: REDIS_PORT
               name: env
-        - name: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
-          valueFrom:
-            configMapKeyRef:
-              key: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
-              name: env
         - name: SENTRY
           valueFrom:
             configMapKeyRef:

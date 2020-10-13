@@ -100,11 +100,6 @@ spec:
           value: $(REDIS_SERVICE_HOST)
         - name: REDIS_PORT
           value: $(REDIS_SERVICE_PORT)
-        - name: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
-          valueFrom:
-            configMapKeyRef:
-              key: SCRAPER_DISTRIBUTOR_CHUNK_LENGTH
-              name: env
         - name: SENTRY
           valueFrom:
             configMapKeyRef:
