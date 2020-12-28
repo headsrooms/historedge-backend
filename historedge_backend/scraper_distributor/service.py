@@ -2,11 +2,11 @@ import sys
 from uuid import uuid4
 
 import orjson
-import uvloop
+from loguru import logger
 from tortoise import Tortoise, run_async
 
-from loguru import logger
-
+from historedge_backend.models import PageVisit
+from historedge_backend.producer import PeriodicProducer
 from historedge_backend.settings import (
     DB_USER,
     DB_PASSWORD,
@@ -17,8 +17,6 @@ from historedge_backend.settings import (
     REDIS_HOST,
     REDIS_PORT,
 )
-from historedge_backend.models import PageVisit
-from historedge_backend.producer import PeriodicProducer
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -72,7 +70,5 @@ class ScraperDistributor(PeriodicProducer):
 
 
 if __name__ == "__main__":
-    uvloop.install()
-
     distributor = ScraperDistributor.create("pages_to_scrape", REDIS_HOST, REDIS_PORT)
     run_async(distributor.run())

@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import List, Dict
 from uuid import UUID, uuid4
 
-from loguru import logger
 import orjson
+from loguru import logger
 from pydantic import BaseModel
 
 from historedge_backend.event import RedisEvent

@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import Dict
 
 from loguru import logger
+from playwright.async_api import Browser
 from pydantic import ValidationError
-from pyppeteer.browser import Browser
 from tortoise import Tortoise
 
 from historedge_backend.consumer import Consumer
@@ -27,7 +27,6 @@ class ScraperConsumer(Consumer):
 
     async def finalize(self):
         logger.info(f"Finalizing {str(self)}")
-        await self.browser.close()
         await Tortoise.close_connections()
 
     async def handle_event(self, event: Dict[bytes, bytes]):

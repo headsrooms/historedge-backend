@@ -1,9 +1,8 @@
 from typing import List
 
 from loguru import logger
-from pyppeteer.browser import Browser
-from pyppeteer.errors import TimeoutError, PageError, NetworkError
-from pyppeteer_stealth import stealth
+from playwright import Error
+from playwright.async_api import Browser
 
 from historedge_backend.event import RedisEvent
 from historedge_backend.models import PageVisit, Page
@@ -36,13 +35,7 @@ class PageToScrape(RedisEvent):
             "Before scraping {id} url:{url}", **self.dict(),
         )
 
-        try:
-            await self.get_page_content(browser, self, stealth_activated)
-        except (TimeoutError, PageError, NetworkError) as e:
-            logger.exception(str(e))
-        except Exception as e:
-            logger.exception("Exception not caught specifically")
-            logger.exception(str(e))
+        await self.get_page_content(browser, self, stealth_activated)
 
         logger.info(
             "Scrape finished {id} url:{url}", **self.dict(),
@@ -55,17 +48,14 @@ class PageToScrape(RedisEvent):
         browser_page = await browser.newPage()
 
         if stealth_activated:
-            await stealth(browser_page)
+            pass
         try:
-            response = await browser_page.goto(
-                page.url, timeout=BROWSER_TIMEOUT, waitUntil="networkidle2"
-            )
-        except (TimeoutError, NetworkError, PageError) as e:
+            response = await browser_page.goto(page.url, waitUntil="networkidle")
+        except Error as e:
             logger.info(str(e))
             await page.save_as_failing_page(str(e))
         else:
             if response and response.status < 400:
-                await browser_page.waitFor(WAIT_AFTER_BROWSE)
                 html = await browser_page.content()
                 content = get_text_content(html)
                 links = get_links(html)

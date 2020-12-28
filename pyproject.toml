@@ -5,27 +5,24 @@ description = "Historedge backend"
 authors = ["Pablo Cabezas <headsrooms@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-starlette = "^0.13"
-uvicorn = "^0.12"
+python = "^3.8"
+starlette = "^0.14"
+uvicorn = "^0.13"
 jinja2 = "^2.11"
 pyyaml = "^5.3"
-ujson = "^3.2"
 itsdangerous = "^1.1"
 python-dotenv = "^0.14"
-pydantic = "^1.6"
-uvloop = "^0.14"
+pydantic = "^1.7"
 asyncpg = "^0.21"
 aredis = "^1.1"
 orjson = "^3.4"
-pyppeteer = { git = "https://github.com/pyppeteer/pyppeteer", rev = "dev" }
+playwright = "^0"
 selectolax = "^0.2"
-pyppeteer_stealth = "^2.6"
 aioitertools = "^0.7"
 loguru = "^0.5"
 httptools = "^0.1"
 tortoise-orm = {extras = ["accel"], version = "^0.16"}
-aiometer = "^0.2.1"
+aiometer = "^0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = { version = "^6.0.0-rc", allow-prereleases = true }

@@ -1,7 +1,6 @@
 import sys
 from typing import Dict
 
-import uvloop
 from loguru import logger
 from pydantic import ValidationError
 from tortoise import Tortoise, run_async
@@ -44,7 +43,5 @@ class RealtimeLogger(Consumer):
 
 
 if __name__ == "__main__":
-    uvloop.install()
-
     logger = RealtimeLogger.create("realtime_pages", "group", REDIS_HOST, REDIS_PORT)
     run_async(logger.run())
