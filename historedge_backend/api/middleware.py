@@ -1,5 +1,6 @@
 from starlette.exceptions import ExceptionMiddleware
 from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
@@ -20,4 +21,5 @@ if settings.GZIP_COMPRESSION:
 
 middleware += [
     Middleware(ExceptionMiddleware),
+    Middleware(CORSMiddleware, allow_origins=["*"]),
 ]
