@@ -21,9 +21,12 @@ async def get_page_visits(request: Request) -> OrjsonResponse:
     if is_processed or without_errors:
         is_processed = is_processed == "true" or is_processed == "True"
         without_errors = without_errors == "true" or without_errors == "True"
-        pages = PageVisit.filter(
-            is_processed=is_processed, processing_error__isnull=without_errors
-        )
+        if without_errors:
+            pages = PageVisit.filter(
+                is_processed=is_processed, processing_error__isnull=without_errors
+            )
+        else:
+            pages = PageVisit.filter(is_processed=is_processed)
     else:
         pages = PageVisit.all()
     count = await pages.count()
