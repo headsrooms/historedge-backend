@@ -5,6 +5,7 @@ from typing import Tuple, Dict, List, AsyncIterable
 from uuid import uuid4
 
 from aredis import StrictRedis
+from loguru import logger
 
 from historedge_backend.channel import RedisChannel
 
@@ -57,8 +58,8 @@ class Consumer(ABC):
 
     async def run(self):
         await self.initialize()
+        stream_idx = {self.channel.stream: ">"}
         try:
-            stream_idx = {self.channel.stream: ">"}
             while True:
                 handle_tasks = []
                 async for event in self.get_events(stream_idx):
@@ -66,5 +67,8 @@ class Consumer(ABC):
                         handle_tasks.append(self.handle_event(event))
                 if handle_tasks:
                     await asyncio.gather(*handle_tasks)
+        except Exception as e:
+            logger.exception(e)
+            raise
         finally:
             await self.finalize()
