@@ -2,7 +2,7 @@ import sys
 from uuid import uuid4
 
 import orjson
-import uvloop
+from loguru import logger
 from tortoise import Tortoise, run_async
 
 from loguru import logger
@@ -72,7 +72,5 @@ class ScraperDistributor(PeriodicProducer):
 
 
 if __name__ == "__main__":
-    uvloop.install()
-
     distributor = ScraperDistributor.create("pages_to_scrape", REDIS_HOST, REDIS_PORT)
     run_async(distributor.run())

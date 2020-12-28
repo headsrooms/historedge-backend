@@ -1,13 +1,11 @@
 import asyncio
-import logging
 import sys
 from dataclasses import dataclass, asdict
 from uuid import uuid4
 
-import uvloop
 from aredis import StrictRedis
 from loguru import logger
-from pyppeteer import launch
+from playwright import async_playwright
 
 from historedge_backend.channel import RedisChannel
 from historedge_backend.scraper.consumer import ScraperConsumer
@@ -20,7 +18,6 @@ from historedge_backend.settings import (
     REDIS_HOST,
     REDIS_PORT,
     HEADLESS,
-    BROWSER_ARGS,
     SCRAPER_ITEMS_PER_READ,
     SCRAPER_STEALTH,
 )
@@ -86,8 +83,6 @@ class Scraper:
 
 
 if __name__ == "__main__":
-    uvloop.install()
-
     scraper = Scraper.create(
         "pages_to_scrape",
         "group",

@@ -1,14 +1,16 @@
 import sys
 from typing import Dict, Any, AsyncIterable
 
-from loguru import logger
 import orjson
-import uvloop
 from aioitertools.more_itertools import chunked
+from loguru import logger
 from pydantic import ValidationError
 from tortoise import Tortoise, run_async
 from tortoise.exceptions import DoesNotExist
 
+from historedge_backend.events.history import HistoryDumpReceived
+from historedge_backend.intercom import Intercom
+from historedge_backend.models import User
 from historedge_backend.settings import (
     DB_USER,
     DB_PASSWORD,
@@ -19,9 +21,6 @@ from historedge_backend.settings import (
     REDIS_HOST,
     REDIS_PORT,
 )
-from historedge_backend.events.history import HistoryDumpReceived
-from historedge_backend.intercom import Intercom
-from historedge_backend.models import User
 
 DB_URL = f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
@@ -74,8 +73,6 @@ class HistoryDistributor(Intercom):
 
 
 if __name__ == "__main__":
-    uvloop.install()
-
     distributor = HistoryDistributor.create(
         "history_dumps", "group", "history_chunks", REDIS_HOST, REDIS_PORT,
     )

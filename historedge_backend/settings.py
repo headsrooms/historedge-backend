@@ -1,7 +1,6 @@
 from secrets import token_urlsafe
 
 from starlette.config import Config
-
 # Config will be read from environment variables and/or ".env" files.
 from starlette.datastructures import Secret
 
