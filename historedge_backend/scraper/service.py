@@ -69,17 +69,11 @@ class Scraper:
         logger.info(f"Finalizing {str(self)}")
 
     async def run(self):
-        browser = await launch(
-            headless=HEADLESS,
-            autoClose=False,
-            logLevel=logging.INFO,
-            ignoreHTTPSErrors=True,
-            args=BROWSER_ARGS,
-        )
-
-        await self.initialize(browser)
-        await self.consumer.run()
-        await self.finalize()
+        async with async_playwright() as p:
+            browser = await p.firefox.launch(headless=HEADLESS)
+            await self.initialize(browser)
+            await self.consumer.run()
+            await self.finalize()
 
 
 if __name__ == "__main__":
