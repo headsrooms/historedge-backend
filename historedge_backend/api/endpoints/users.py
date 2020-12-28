@@ -28,6 +28,5 @@ async def create_user(request: Request) -> PlainJSONResponse:
             status_code=409,
             detail=f"That email has already been used to create another account",
         )
-
-    response = OutputUserSchema.from_orm(user)
+    response = await OutputUserSchema.from_tortoise_orm(user)
     return PlainJSONResponse(response.json(), status_code=HTTP_201_CREATED)
