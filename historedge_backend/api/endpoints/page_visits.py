@@ -15,25 +15,25 @@ PAGES_TO_SCRAPE = "pages_to_scrape"
 
 async def get_page_visits(request: Request) -> OrjsonResponse:
     is_processed = request.query_params.get("is_processed")
-    without_errors = request.query_params.get("without_errors")
+    successful = request.query_params.get("successful")
     page = int(request.query_params.get("page", 1))
     page_size = int(request.query_params.get("page_size", 10))
     offset = (page - 1) * page_size if page != 1 else 0
 
-    count, pages = await get_page_visits_queries(is_processed, without_errors)
+    count, pages = await get_page_visits_queries(is_processed, successful)
     pages = pages.limit(page_size).offset(offset)
     pages = await OutputPageVisitListSchema.from_queryset(pages)
     response = orjson.loads(pages.json())
     return OrjsonResponse({"count": count, "page_visits": response})
 
 
-async def get_page_visits_queries(is_processed, without_errors):
-    if is_processed or without_errors:
+async def get_page_visits_queries(is_processed, successful):
+    if is_processed or successful:
         if is_processed:
             is_processed = is_processed == "true" or is_processed == "True"
-        if without_errors:
-            without_errors = without_errors == "true" or without_errors == "True"
-        page_visits_filter = await get_page_visits_filter_parameters(is_processed, without_errors)
+        if successful:
+            successful = successful == "true" or successful == "True"
+        page_visits_filter = await get_page_visits_filter_parameters(is_processed, successful)
         pages = PageVisit.filter(**page_visits_filter)
     else:
         pages = PageVisit.all()
@@ -41,11 +41,11 @@ async def get_page_visits_queries(is_processed, without_errors):
     return count, pages
 
 
-async def get_page_visits_filter_parameters(is_processed, without_errors) -> Dict[str, bool]:
+async def get_page_visits_filter_parameters(is_processed, successful) -> Dict[str, bool]:
     filters = {}
 
-    if without_errors is not None:
-        filters["processing_error__isnull"] = without_errors
+    if successful is not None:
+        filters["processing_error__isnull"] = successful
     if is_processed is not None:
         filters["is_processed"] = is_processed
 
