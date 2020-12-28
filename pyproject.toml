@@ -16,7 +16,7 @@ pydantic = "^1.7"
 asyncpg = "^0.21"
 aredis = "^1.1"
 orjson = "^3.4"
-pyppeteer = { git = "https://github.com/pyppeteer/pyppeteer", rev = "dev" }
+playwright = "^0"
 selectolax = "^0.2"
 pyppeteer_stealth = "^2.6"
 aioitertools = "^0.7"

@@ -1,8 +1,55 @@
 FROM headsrooms/historedge:latest
-RUN apt-get -y install \
-gconf-service libasound2 libatk1.0-0 libatk-bridge2.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 \
-libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 \
-libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
-libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 \
-libnss3 lsb-release xdg-utils wget xvfb libgbm-dev xauth libnotify-dev chromium-driver
-RUN pyppeteer-install
+
+# 2. Install WebKit dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libwoff1 \
+    libopus0 \
+    libwebp6 \
+    libwebpdemux2 \
+    libenchant1c2a \
+    libgudev-1.0-0 \
+    libsecret-1-0 \
+    libhyphen0 \
+    libgdk-pixbuf2.0-0 \
+    libegl1 \
+    libnotify4 \
+    libxslt1.1 \
+    libevent-2.1-6 \
+    libgles2 \
+    libvpx5 \
+    libxcomposite1 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libepoxy0 \
+    libgtk-3-0 \
+    libharfbuzz-icu0
+
+# 3. Install gstreamer and plugins to support video playback in WebKit.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgstreamer-gl1.0-0 \
+    libgstreamer-plugins-bad1.0-0 \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-libav
+
+# 4. Install Chromium dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    fonts-noto-color-emoji \
+    libxtst6
+
+# 5. Install Firefox dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libdbus-glib-1-2 \
+    libxt6
+
+# 6. Install ffmpeg to bring in audio and video codecs necessary for playing videos in Firefox.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg
+
+# 7. (Optional) Install XVFB if there's a need to run browsers in headful mode
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    xvfb
+
+RUN python3 -m playwright install
