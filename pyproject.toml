@@ -5,12 +5,11 @@ description = "Historedge backend"
 authors = ["Pablo Cabezas <headsrooms@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-starlette = "^0.13"
-uvicorn = "^0.12"
+python = "^3.8"
+starlette = "^0.14"
+uvicorn = "^0.13"
 jinja2 = "^2.11"
 pyyaml = "^5.3"
-ujson = "^3.2"
 itsdangerous = "^1.1"
 python-dotenv = "^0.14"
 pydantic = "^1.6"
